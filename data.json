@@ -13,8 +13,8 @@
   },
   {
         "nodeId": "poker_demo_001",
-        "title": "BB Defense vs BTN Open Strategy Matrix",
-        "pot": "3.50 BB",
+        "title": "Facing 4Bet OOP",
+        "pot": "50.00 BB",
         "communityCards": [],
         "quizType": "poker_drag",
         "displayText": "The Button opens to 2.50 BB. Small Blind folds. Action shifts entirely to you in the Big Blind with effective stack metrics.",
@@ -22,9 +22,9 @@
           {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
           {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
           {"position": "CO", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
-          {"position": "BTN", "isActive": true, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "2.50 BB"},
-          {"position": "SB", "isActive": false, "isTurn": false, "stackSize": "99.50 BB", "currentBet": "0.50 BB"},
-          {"position": "BB", "isActive": true, "isTurn": true, "stackSize": "89.00 BB", "currentBet": "1.00 BB", "holeCards": ["Ah", "Kh"], "isHero": true}
+          {"position": "BTN", "isActive": true, "isTurn": false, "stackSize": "198.61 BB", "currentBet": "0.00 BB"},
+          {"position": "SB", "isActive": true, "isTurn": true, "stackSize": "113.88 BB", "currentBet": "0.00 BB", "holeCards": ["Kc", "Tc"], "isHero": true},
+          {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
         ],
         "choices": [
           {"hand": "AhKh", "targetCategory": "Raise/3-Bet"},
