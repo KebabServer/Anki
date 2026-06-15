@@ -173,4 +173,31 @@
           cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#2563eb', 'important'));
         }
         // Clubs -> Green
-        else if (structuralText.includes
+        else if (structuralText.includes('♣') || structuralText.includes('c')) {
+          cardEl.style.setProperty('color', '#16a34a', 'important');
+          cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#16a34a', 'important'));
+        }
+        // Hearts -> Red
+        else if (structuralText.includes('♥') || structuralText.includes('h')) {
+          cardEl.style.setProperty('color', '#dc2626', 'important');
+          cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#dc2626', 'important'));
+        }
+        // Spades -> Black
+        else if (structuralText.includes('♠') || structuralText.includes('s')) {
+          cardEl.style.setProperty('color', '#1e293b', 'important');
+          cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#1e293b', 'important'));
+        }
+      });
+
+      // Toggle Listener Controls
+      document.getElementById('compact-toggle').addEventListener('change', (e) => {
+        isCompactMode = e.target.checked;
+        const tableObj = container.querySelector('.poker-table-area');
+        if (tableObj) {
+          if (isCompactMode) tableObj.classList.add('compact');
+          else tableObj.classList.remove('compact');
+        }
+      });
+
+      container.dataset.totalItems = card.choices.length;
+    }
