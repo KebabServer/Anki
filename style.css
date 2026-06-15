@@ -171,4 +171,45 @@
     .poker-table-area.compact .bet-BTN  { top: 40%; right: 90px; transform: translateY(-50%); }
     .poker-table-area.compact .bet-SB   { bottom: 48px; right: 30%; }
     .poker-table-area.compact .bet-BB   { bottom: 48px; left: 30%; }
+
+    /* --- CONTENT BOX TYPOGRAPHY RENDERING --- */
+#html-answer-target h1, 
+#html-answer-target h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 14px 0 8px 0;
+}
+
+#html-answer-target h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin: 12px 0 6px 0;
+}
+
+#html-answer-target strong, 
+#html-answer-target b {
+  font-weight: 700;
+  color: #3b82f6; /* Accents key terms in blue */
+}
+
+#html-answer-target ul, 
+#html-answer-target ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+#html-answer-target li {
+  margin-bottom: 4px;
+  line-height: 1.6;
+}
+
+#html-answer-target code {
+  font-family: monospace;
+  background-color: #0f172a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #f87171;
+}
   </style>
