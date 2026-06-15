@@ -8,8 +8,8 @@
   {
     "nodeId": "Facing_4Bet_OOP_Donking",
     "quizType": "anki",
-    "question": "Facing 4Bet OOP:\n When do we want to construct a donking range? <br> What mistakes to avoid when constructing a leading range?",
-    "answer": "Your cold call range has flopped multiple sets.\n Your opponent is likely check back (AK combos have missed the board)\n Your hand class has a clear answer vs raise\n Don't lead/fold lots of equity hands\n Don't lead complete trash"   
+    "question": "Facing 4Bet OOP: <br> When do we want to construct a donking range? <br> What mistakes to avoid when constructing a leading range?",
+    "answer": "Your cold call range has flopped multiple sets. <br> Your opponent is likely check back (AK combos have missed the board) <br> Your hand class has a clear answer vs raise <br> Don't lead/fold lots of equity hands <br> Don't lead complete trash"   
   },
   {
     "nodeId": "Facing_4Bet_OOP_Splitting_Raise_Ranges ",
