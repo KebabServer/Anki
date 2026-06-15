@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Advanced Spaced Repetition & Strategy Deck Engine</title>
+
+  <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
+
+  <link rel="icon" href="data:,">
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="poker-matrix.css">
+  
+  <link rel="stylesheet" href="style/base.css">
+  <link rel="stylesheet" href="style/layout.css">
+  <link rel="stylesheet" href="style/components.css">
+
+  <link rel="stylesheet" href="style/anki.css">
+  <link rel="stylesheet" href="style/multiple-choice.css">
+  <link rel="stylesheet" href="style/drag-drop.css">
+
+  <link rel="stylesheet" href="style/poker-core.css">
+  <link rel="stylesheet" href="style/poker-layout-large.css">
+  <link rel="stylesheet" href="style/poker-layout-compact.css">
+
+  <link rel="stylesheet" href="style/content-renderer.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <div class="wrapper" style="margin-bottom: 16px;">
+    <div class="header-row">
+      <div class="header-title">
+        <h1>🧠 Spaced Repetition Core Engine</h1>
+        <p>Automated Deck Loader & Performance Tracker</p>
+      </div>
+      <span id="progress-text" class="progress-badge">0 / 0 Cards</span>
+    </div>
+    <div class="progress-track">
+      <div id="progress-bar" class="progress-fill"></div>
+    </div>
+  </div>
+
+  <div id="card-container" class="engine-container">
+    <div class="loader-screen">
+      <div class="spinner"></div>
+      <p style="font-size: 14px; font-weight: 500; margin: 0;">Resolving System State & Parsing Deck Arrays...</p>
+    </div>
+  </div>
+
+  <div class="controls-panel">
+    <div class="selector-group">
+      <label for="quiz-selector">Jump to Deck Item:</label>
+      <select id="quiz-selector" class="dropdown"></select>
+    </div>
+    <button id="reset-memory-btn" class="btn-destructive">
+      Reset Engine Memory
+    </button>
+  </div>
+  <script>
+    // --- INTEGRATED SUIT MAP & RENDER LOGIC ---
+    const SUIT_MAP = {
+      'h': { className: 'hearts', symbol: '♥', color: '#dc2626' },
+      'd': { className: 'diamonds', symbol: '♦', color: '#2563eb' },
+      'c': { className: 'clubs', symbol: '♣', color: '#16a34a' },
+      's': { className: 'spades', symbol: '♠', color: '#1e293b' }
+    };
+
+    function parseCardHtml(cardStr) {
+      if (cardStr === '??' || !cardStr) return `<div class="card card-back"></div>`;
+      const suitLetter = cardStr.slice(-1).toLowerCase();
+      const value = cardStr.substring(0, cardStr.length - 1);
+      const suitData = SUIT_MAP[suitLetter] || { className: '', symbol: '', color: '' };
+      return `<div class="card ${suitData.className}" data-suit="${suitLetter}"><span>${value}</span><span style="color: ${suitData.color}">${suitData.symbol}</span></div>`;
+    }
+
+    function generateChipStackHtml(betString) {
+      const numVal = parseFloat(betString);
+      if (isNaN(numVal) || numVal <= 0) return '';
+
+      let chipColor = '#cbd5e1';
+      if (numVal >= 1 && numVal < 2.5) chipColor = '#ef4444';
+      if (numVal >= 2.5 && numVal < 10) chipColor = '#3b82f6';
+      if (numVal >= 10) chipColor = '#334155';
+
+      let dynamicStackCount = Math.min(5, Math.floor(numVal / 2.5) + 1);
+
+      let htmlString = '<div class="chip-stack">';
+      for (let i = 0; i < dynamicStackCount; i++) {
+        htmlString += `<div class="poker-chip" style="background: ${chipColor}; bottom: ${i * 2}px; z-index: ${i};"></div>`;
+      }
+      return htmlString + '</div>';
+    }
+
+    // --- FALLBACK INTERNAL REPOSITORY ---
+    const fallbackDeck = [
+      {
+        "nodeId": "anki_demo_001",
+        "quizType": "anki",
+        "question": "Explain the architectural difference between a Monolith and Microservices.",
+        "answer": "A Monolith executes all computing layers inside a unified process pipeline. Microservices isolate distinct operational domains into decoupled, independently deployable services cooperating over safe REST APIs or message brokers."
+      },
+      {
+        "nodeId": "poker_demo_001",
+        "title": "BB Defense vs BTN Open Strategy Matrix",
+        "phase": "PREFLOP",
+        "pot": "3.50 BB",
+        "communityCards": [],
+        "quizType": "poker_drag",
+        "displayText": "The Button opens to 2.50 BB. Small Blind folds. Action shifts entirely to you in the Big Blind with effective stack metrics.",
+        "players": [
+          { "position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB" },
+          { "position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB" },
+          { "position": "CO", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB" },
+          { "position": "BTN", "isActive": true, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "2.50 BB" },
+          { "position": "SB", "isActive": false, "isTurn": false, "stackSize": "99.50 BB", "currentBet": "0.50 BB" },
+          { "position": "BB", "isActive": true, "isTurn": true, "stackSize": "89.00 BB", "currentBet": "1.00 BB", "holeCards": ["Ah", "Kh"], "isHero": true }
+        ],
+        "choices": [
+          { "hand": "AhKh", "targetCategory": "Raise/3-Bet" },
+          { "hand": "2h2d", "targetCategory": "Call" }
+        ]
+      },
+      {
+        "nodeId": "mc_demo_001",
+        "quizType": "multiple_choice",
+        "question": "Which of the following describes an idempotent API method execution footprint?",
+        "options": [
+          { "text": "Every execution modifies server memory state deterministically." },
+          { "text": "Making multiple identical requests has the same side-effect profile as a single request." },
+          { "text": "The method guarantees encryption handling routines via SSL headers." },
+          { "text": "Requests always return cached values without executing database calls." }
+        ],
+        "correctIndex": 1
+      },
+      {
+        "nodeId": "drag_demo_001",
+        "quizType": "drag_drop",
+        "question": "Sort these technical technologies into their proper infrastructure layers:",
+        "choices": [
+          { "text": "Tailwind CSS", "targetCategory": "UI / Client Layer" },
+          { "text": "PostgreSQL", "targetCategory": "Data Persistence" },
+          { "text": "Vue.js Engine", "targetCategory": "UI / Client Layer" },
+          { "text": "Redis Cache", "targetCategory": "Data Persistence" }
+        ]
+      },
+      {
+        "nodeId": "poker_demo_002",
+        "title": "Flop C-Bet Strategy Validation",
+        "phase": "FLOP",
+        "pot": "6.50 BB",
+        "communityCards": ["As", "9h", "2c"],
+        "quizType": "poker_drag",
+        "displayText": "You raised Preflop from the Button and the Big Blind called. The Big Blind checks to you on an Ace-High dry texture.",
+        "players": [
+          { "position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB" },
+          { "position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB" },
+          { "position": "CO", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB" },
+          { "position": "BTN", "isActive": true, "isTurn": true, "stackSize": "96.50 BB", "currentBet": "0.00 BB", "holeCards": ["Kh", "Qh"], "isHero": true },
+          { "position": "SB", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB" },
+          { "position": "BB", "isActive": true, "isTurn": false, "stackSize": "96.50 BB", "currentBet": "0.00 BB" }
+        ],
+        "choices": [
+          { "hand": "KhQh", "targetCategory": "Bet (Bluff)" }
+        ]
+      }
+    ];
+
+    // --- APPLICATION CORE RUNTIME ARCHITECTURE ---
+    let deck = [];
+    let sessionQueue = [];
+    let currentCard = null;
+    let stats = JSON.parse(localStorage.getItem('flashcard_engine_stats')) || {};
+    let isCompactMode = true;
+
+    let sessionTotal = 0;
+    let sessionCompleted = 0;
+    let draggedElement = null;
+
+    async function init() {
+      try {
+        const response = await fetch('data.json');
+        if (!response.ok) throw new Error('Network configuration lookup error.');
+        deck = await response.json();
+      } catch (error) {
+        console.warn('Fallback to internal repository.');
+        deck = fallbackDeck;
+      }
+
+      sessionQueue = deck.filter(card => !stats[card.nodeId] || stats[card.nodeId] < 2);
+
+      if (sessionQueue.length === 0) {
+        sessionQueue = [...deck];
+        stats = {};
+        localStorage.removeItem('flashcard_engine_stats');
+      }
+
+      sessionTotal = sessionQueue.length;
+      sessionCompleted = 0;
+      initEngineUtilities(deck);
+      updateProgress();
+      nextCard();
+    }
+
+    function initEngineUtilities(deckData) {
+      const selector = document.getElementById('quiz-selector');
+      const resetBtn = document.getElementById('reset-memory-btn');
+
+      if (selector && Array.isArray(deckData)) {
+        selector.innerHTML = deckData.map((card, idx) => {
+          const typeLabel = card.quizType ? `[${card.quizType.toUpperCase()}]` : '[QUIZ]';
+          const summaryText = card.question || card.title || card.displayText || `Item ${idx + 1}`;
+          const truncatedSummary = summaryText.length > 45 ? summaryText.substring(0, 45) + '...' : summaryText;
+          return `<option value="${card.nodeId}">${typeLabel} ${truncatedSummary}</option>`;
+        }).join('');
+
+        selector.addEventListener('change', (e) => {
+          const targetNodeId = e.target.value;
+          const targetCard = deck.find(c => c.nodeId === targetNodeId);
+          if (targetCard) {
+            currentCard = targetCard;
+            // Remote jump breaks execution tracking; pull out of running standard flow safely
+            const container = document.getElementById('card-container');
+            renderCardRouter(currentCard, container);
+          }
+        });
+      }
+
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          if (confirm("Permanently wipe local storage execution tracking logs?")) {
+            localStorage.removeItem('flashcard_engine_stats');
+            window.location.reload();
+          }
+        });
+      }
+    }
+
+    function updateProgress() {
+      document.getElementById('progress-text').innerText = `${sessionCompleted} / ${sessionTotal} Cards Handled`;
+      const pct = sessionTotal === 0 ? 0 : (sessionCompleted / sessionTotal) * 100;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+    }
+
+    function saveProgress(nodeId, masteryValue) {
+      stats[nodeId] = masteryValue;
+      localStorage.setItem('flashcard_engine_stats', JSON.stringify(stats));
+    }
+
+    function handleCardComplete(masteryValue) {
+      saveProgress(currentCard.nodeId, masteryValue);
+      if (masteryValue === 0) {
+        sessionQueue.push(currentCard);
+      } else {
+        sessionCompleted++;
+      }
+      
+      updateProgress();
+      nextCard();
+    }
+
+    function nextCard() {
+      const container = document.getElementById('card-container');
+      const selector = document.getElementById('quiz-selector');
+
+      if (sessionQueue.length === 0) {
+        container.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 48px 0; flex-grow: 1;">
+            <div style="background: rgba(20,83,45,0.4); padding: 16px; border-radius: 9999px; border: 1px solid rgba(34,197,94,0.3); margin-bottom: 16px; font-size: 24px;">🎯</div>
+            <h2 style="font-size: 24px; font-weight: 700; color: #4ade80; margin: 0 0 8px 0;">Deck Pipeline Evaluated!</h2>
+            <button onclick="localStorage.removeItem('flashcard_engine_stats'); location.reload();" style="margin-top: 24px; padding: 8px 16px; background: #475569; border: none; color: white; border-radius: 4px; cursor: pointer;">Reset Cache</button>
+          </div>
+        `;
+        return;
+      }
+
+      currentCard = sessionQueue.shift();
+      if(selector) selector.value = currentCard.nodeId;
+      renderCardRouter(currentCard, container);
+    }
+
+    function renderCardRouter(card, container) {
+      container.innerHTML = '';
+      switch (card.quizType) {
+        case 'anki': return renderAnkiMode(card, container);
+        case 'multiple_choice': return renderMultipleChoiceMode(card, container);
+        case 'drag_drop': return renderStandardDragDropMode(card, container);
+        case 'poker_drag': return renderAdvancedPokerMode(card, container);
+        default: container.innerHTML = `<p style="color: #f87171; padding: 16px;">Unknown execution layout mapping.</p>`;
+      }
+    }
+
+    // --- 1. MODE: STANDARD ANKI RATING FLASHCARD ---
+    function renderAnkiMode(card, container) {
+      container.innerHTML = `
+        <div class="flex-col-layout">
+          <div>
+            <span class="badge badge-blue">Standard Flashcard</span>
+            <h2 style="font-size: 1.125rem; font-weight: 500; color: white; margin-top: 16px; line-height: 1.6;">${card.question}</h2>
+          </div>
+          <div id="answer-area" class="hidden" style="flex-direction: column; width: 100%; margin-top: 24px; background: rgba(15,23,42,0.4); border: 1px solid rgba(51,65,85,0.5); border-radius: 12px; padding: 16px; box-sizing: border-box;">
+            <div style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom:16px;">${card.answer}</div>
+            <div class="grid-3-col">
+              <button onclick="handleCardComplete(0)" class="btn-rating btn-rate-bad">Badly (Re-queue)</button>
+              <button onclick="handleCardComplete(1)" class="btn-rating btn-rate-ok">OK (Keep Loop)</button>
+              <button onclick="handleCardComplete(2)" class="btn-rating btn-rate-well">Well (Mastered)</button>
+            </div>
+          </div>
+          <button id="show-btn" class="btn-primary" style="margin-top: 32px;">Show Answer Formulation</button>
+        </div>
+      `;
+
+      document.getElementById('show-btn').addEventListener('click', (e) => {
+        e.target.classList.add('hidden');
+        const ans = document.getElementById('answer-area');
+        ans.classList.remove('hidden');
+        ans.classList.add('flex-show');
+      });
+    }
+
+    // --- 2. MODE: MULTIPLE CHOICE OPTION PARSER ---
+    function renderMultipleChoiceMode(card, container) {
+      const optionsHtml = card.options.map((opt, i) =>
+        `<button data-idx="${i}" class="mc-btn"><span class="mc-prefix">${String.fromCharCode(65 + i)}</span> <span>${opt.text || opt}</span></button>`
+      ).join('');
+
+      container.innerHTML = `
+        <div class="flex-col-layout">
+          <div>
+            <span class="badge badge-indigo">Multiple Choice</span>
+            <h2 style="font-size: 1.125rem; font-weight: 500; color: white; margin: 16px 0 24px 0; line-height: 1.6;">${card.question}</h2>
+            <div class="mc-options-list" id="mc-options">${optionsHtml}</div>
+          </div>
+          <button id="mc-next" class="hidden btn-primary" style="margin-top: 24px;">Advance Deck Loop</button>
+        </div>
+      `;
+
+      const btns = container.querySelectorAll('.mc-btn');
+      btns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const currentTarget = e.currentTarget;
+          if (container.querySelector('.pointer-events-none')) return;
+
+          btns.forEach(b => b.classList.add('pointer-events-none', 'opacity-40'));
+          const selectedIdx = parseInt(currentTarget.dataset.idx, 10);
+          const isCorrect = selectedIdx === card.correctIndex;
+
+          currentTarget.classList.remove('opacity-40');
+          if (isCorrect) {
+            currentTarget.classList.add('state-correct');
+          } else {
+            currentTarget.classList.add('state-incorrect');
+            btns[card.correctIndex].classList.remove('opacity-40');
+            btns[card.correctIndex].classList.add('state-revealed');
+          }
+
+          const nextBtn = document.getElementById('mc-next');
+          nextBtn.classList.remove('hidden');
+          nextBtn.onclick = () => handleCardComplete(isCorrect ? 2 : 0);
+        });
+      });
+    }
+
+    // --- 3. MODE: STANDARD CATEGORICAL DRAG & DROP ---
+    function renderStandardDragDropMode(card, container) {
+      const categories = [...new Set(card.choices.map(c => c.targetCategory))];
+
+      let draggablesHtml = card.choices.map((c, i) =>
+        `<div draggable="true" data-target="${c.targetCategory}" id="dd-item-${i}" class="draggable-item" ondragstart="dragStart(event)">${c.text}</div>`
+      ).join('');
+
+      let dropzonesHtml = categories.map(cat => `
+        <div class="dropzone-column">
+          <h3 class="dropzone-title">${cat}</h3>
+          <div data-cat="${cat}" class="dropzone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
+        </div>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="flex-col-layout">
+          <div>
+            <span class="badge badge-purple">Categorized Sorting</span>
+            <h2 style="font-size: 1rem; font-weight: 500; color: #e2e8f0; margin: 12px 0 16px 0; line-height: 1.6;">${card.question}</h2>
+            <div id="source-zone" class="source-box" ondragover="dragOver(event)" ondrop="dropSource(event)">${draggablesHtml}</div>
+            <div class="drag-container">${dropzonesHtml}</div>
+          </div>
+          <button id="dd-next" class="hidden btn-primary" style="margin-top: 24px;">Submit Classifications</button>
+        </div>
+      `;
+      container.dataset.totalItems = card.choices.length;
+    }
+
+    // --- 4. MODE: ADVANCED POKER STRATEGY MATRIX ---
+    function renderAdvancedPokerMode(card, container) {
+      let playersHtml = '';
+      let betsHtml = '';
+
+      card.players.forEach(player => {
+        let holeCardsHtml = '';
+        if (player.isActive) {
+          holeCardsHtml = (player.holeCards && player.holeCards.length > 0) 
+            ? player.holeCards.map(parseCardHtml).join('') 
+            : parseCardHtml('??') + parseCardHtml('??');
+        }
+
+        const isTurnClass = player.isTurn ? 'active-turn' : '';
+        const isActiveClass = player.isActive ? '' : 'inactive';
+        const dealerButtonHtml = player.position === 'BTN' ? '<div class="dealer-button">D</div>' : '';
+        const heroLabel = player.isHero ? '<span class="hero-label">(H)</span>' : '';
+
+        playersHtml += `
+          <div class="player-seat seat-${player.position} ${isTurnClass} ${isActiveClass}">
+            ${dealerButtonHtml}
+            <div class="player-position">${player.position}${heroLabel}</div>
+            <div class="player-stack">${player.stackSize}</div>
+            <div class="hole-cards">${holeCardsHtml}</div>
+          </div>
+        `;
+
+        if (parseFloat(player.currentBet) > 0) {
+          betsHtml += `
+            <div class="bet-indicator bet-${player.position}">
+              ${generateChipStackHtml(player.currentBet)}
+              <span>${player.currentBet}</span>
+            </div>
+          `;
+        }
+      });
+
+      let communityCardsHtml = (!card.communityCards || card.communityCards.length === 0) 
+        ? `<span class="preflop-runtime-badge">PREFLOP RUNTIME</span>` 
+        : card.communityCards.map(parseCardHtml).join('');
+
+      const categories = [...new Set(card.choices.map(c => c.targetCategory))];
+      const randomizedChoices = [...card.choices].sort(() => Math.random() - 0.5);
+
+      let draggablesHtml = randomizedChoices.map((c, i) => {
+        const suitLetter = c.hand.slice(-1).toLowerCase();
+        const rawValue = c.hand.substring(0, c.hand.length - 1);
+        const look = SUIT_MAP[suitLetter] || { symbol: suitLetter, color: '#f1f5f9' };
+
+        return `
+          <div draggable="true" data-target="${c.targetCategory}" id="poker-item-${i}" class="draggable-token" ondragstart="dragStart(event)">
+            ${rawValue}<span style="color: ${look.color}; margin-left: 2px; font-size: 1.1em;">${look.symbol}</span>
+          </div>
+        `;
+      }).join('');
+
+      let dropzonesHtml = categories.map(cat => `
+        <div class="dropzone-container">
+          <h3 class="dropzone-header">${cat}</h3>
+          <div data-cat="${cat}" class="dropzone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
+        </div>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="poker-wrapper">
+          <div>
+            <div class="header-container">
+              <div>
+                <span class="badge-engine">Poker Matrix Engine</span>
+                <h2 class="header-title">${card.title || 'Game Matrix Checkpoint'}</h2>
+              </div>
+              <div class="toggle-container">
+                <input type="checkbox" id="compact-toggle" ${isCompactMode ? 'checked' : ''} class="toggle-input">
+                <label for="compact-toggle" class="toggle-label">Compact Engine Table</label>
+              </div>
+            </div>
+            <p class="display-text">${card.displayText}</p>
+            <div class="poker-table-area ${isCompactMode ? 'compact' : ''}">
+              <div class="center-board">
+                <div class="community-cards">${communityCardsHtml}</div>
+                <div class="pot-display">
+                  ${generateChipStackHtml(card.pot)}
+                  <span>Pot: ${card.pot}</span>
+                </div>
+              </div>
+              ${playersHtml}
+              ${betsHtml}
+            </div>
+            <div id="source-zone" class="source-zone-container">${draggablesHtml}</div>
+            <div class="dropzones-wrapper">${dropzonesHtml}</div>
+          </div>
+          <button id="dd-next" class="btn-confirm hidden">Confirm Strategic Configuration</button>
+        </div>
+      `;
+
+      document.getElementById('compact-toggle').addEventListener('change', (e) => {
+        isCompactMode = e.target.checked;
+        const tableObj = container.querySelector('.poker-table-area');
+        if (tableObj) tableObj.classList.toggle('compact', isCompactMode);
+      });
+
+      container.dataset.totalItems = card.choices.length;
+    }
+
+    // --- SHARED DRAG AND DROP RUNTIME INTERACTION HANDLERS ---
+    function dragStart(e) {
+      draggedElement = e.target;
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', e.target.id);
+      setTimeout(() => e.target.classList.add('opacity-40'), 0);
+    }
+
+    function dragOver(e) {
+      e.preventDefault();
+      const zone = e.currentTarget;
+      if (zone.classList.contains('dropzone')) zone.classList.add('drag-active');
+    }
+
+    function dragLeave(e) {
+      const zone = e.currentTarget;
+      if (zone.classList.contains('dropzone')) zone.classList.remove('drag-active');
+    }
+
+    function dropSource(e) {
+      e.preventDefault();
+      if (!draggedElement) return;
+      draggedElement.classList.remove('opacity-40', 'state-correct', 'state-incorrect');
+      delete draggedElement.dataset.correct;
+
+      document.getElementById('source-zone').appendChild(draggedElement);
+      checkDragAndDropCompletionState();
+    }
+
+    function dropToMatch(e) {
+      e.preventDefault();
+      const zone = e.currentTarget;
+      zone.classList.remove('drag-active');
+      if (!draggedElement) return;
+      draggedElement.classList.remove('opacity-40');
+
+      const expectedCategory = draggedElement.getAttribute('data-target');
+      const dropContainerCategory = zone.getAttribute('data-cat');
+
+      zone.appendChild(draggedElement);
+
+      const isCorrect = expectedCategory === dropContainerCategory;
+      draggedElement.classList.toggle('state-correct', isCorrect);
+      draggedElement.classList.toggle('state-incorrect', !isCorrect);
+      draggedElement.dataset.correct = isCorrect ? "true" : "false";
+
+      checkDragAndDropCompletionState();
+    }
+
+    function checkDragAndDropCompletionState() {
+      const container = document.getElementById('card-container');
+      const expectedTotal = parseInt(container.dataset.totalItems, 10);
+
+      const elementsInScope = Array.from(container.querySelectorAll('[draggable="true"]'));
+      const localizedDropzonesCount = elementsInScope.filter(el => el.parentElement.classList.contains('dropzone')).length;
+      const perfectScoreValidated = elementsInScope.every(el => el.dataset.correct === "true");
+
+      const nextActionBtn = document.getElementById('dd-next');
+
+      if (localizedDropzonesCount === expectedTotal) {
+        nextActionBtn.classList.remove('hidden');
+        nextActionBtn.onclick = () => handleCardComplete(perfectScoreValidated ? 2 : 0);
+      } else {
+        nextActionBtn.classList.add('hidden');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+
+</html>
