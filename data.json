@@ -112,6 +112,9 @@
         ],
         "choices": [
          {"hand": "7d6d", "targetCategory": "Raise All In"},
+         {"hand": "QcQs", "targetCategory": "Raise All In"},
+         {"hand": "5s4s", "targetCategory": "Min-Raise"},
+         {"hand": "KdQd", "targetCategory": "Min-Raise"},
          {"hand": "Tc9c", "targetCategory": "Fold"}
         ]
       }
