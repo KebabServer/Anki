@@ -213,6 +213,7 @@ function initEngineUtilities(deckData, activeIndexCallback) {
     let deck = [];
     let sessionQueue = [];
     let currentCard = null;
+    let currentCardIndex = 0;
     let stats = JSON.parse(localStorage.getItem('flashcard_engine_stats')) || {};
     let isCompactMode = true; // Global layout toggle configuration state
 
