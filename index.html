@@ -305,7 +305,7 @@ function initEngineUtilities(deckData, activeIndexCallback) {
 
     // --- 1. MODE: STANDARD ANKI RATING FLASHCARD ---
     function renderAnkiMode(card, container) {
-  // 1. Build the base container frame structure
+  // 1. Build the base container frame structure AND inject the answer right away
   container.innerHTML = `
     <div class="flex-grow flex flex-col justify-between h-full">
       <div>
@@ -314,7 +314,7 @@ function initEngineUtilities(deckData, activeIndexCallback) {
       </div>
       
       <div id="answer-area" class="hidden flex-col w-full mt-6 bg-slate-900/40 border border-slate-700/50 rounded-xl p-4">
-        <div id="html-answer-target" class="text-sm text-slate-300 leading-relaxed"></div>
+        <div id="html-answer-target" class="text-sm text-slate-300 leading-relaxed">${card.answer}</div>
         
         <div class="grid grid-cols-3 gap-3 mt-6">
           <button onclick="handleCardComplete(0)" class="px-3 py-2 bg-red-950/40 hover:bg-red-900 text-red-200 text-xs font-semibold rounded-lg transition-all border border-red-800/40">Badly (Re-queue)</button>
@@ -327,10 +327,7 @@ function initEngineUtilities(deckData, activeIndexCallback) {
     </div>
   `;
 
-  // 2. Explicitly target the node and parse the raw HTML code from JSON
-  document.getElementById('html-answer-target').innerHTML = card.answer;
-
-  // 3. Keep your existing show-button logic intact
+  // 2. Keep your existing show-button logic intact
   document.getElementById('show-btn').addEventListener('click', (e) => {
     e.target.classList.add('hidden');
     const ans = document.getElementById('answer-area');
