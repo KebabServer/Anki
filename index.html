@@ -241,32 +241,39 @@
 
     // --- 1. MODE: STANDARD ANKI RATING FLASHCARD ---
     function renderAnkiMode(card, container) {
-      container.innerHTML = `
-        <div class="flex-grow flex flex-col justify-between h-full">
-          <div>
-            <span class="text-[10px] uppercase tracking-widest font-mono bg-blue-900/60 border border-blue-700/40 text-blue-300 px-2 py-0.5 rounded">Standard Flashcard</span>
-            <h2 class="text-lg font-medium text-white mt-4 leading-relaxed">${card.question}</h2>
-          </div>
-          
-          <div id="answer-area" class="hidden flex-col w-full mt-6 bg-slate-900/40 border border-slate-700/50 rounded-xl p-4">
-            <div class="text-sm text-slate-300 leading-relaxed">${card.answer}</div>
-            <div class="grid grid-cols-3 gap-3 mt-6">
-              <button onclick="handleCardComplete(0)" class="px-3 py-2 bg-red-950/40 hover:bg-red-900 text-red-200 text-xs font-semibold rounded-lg transition-all border border-red-800/40">Badly (Re-queue)</button>
-              <button onclick="handleCardComplete(1)" class="px-3 py-2 bg-yellow-950/40 hover:bg-yellow-900 text-yellow-200 text-xs font-semibold rounded-lg transition-all border border-yellow-800/40">OK (Keep Loop)</button>
-              <button onclick="handleCardComplete(2)" class="px-3 py-2 bg-green-950/40 hover:bg-green-900 text-green-200 text-xs font-semibold rounded-lg transition-all border border-green-800/40">Well (Mastered)</button>
-            </div>
-          </div>
-          
-          <button id="show-btn" class="mt-8 w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold tracking-wide transition-colors shadow-lg shadow-blue-900/30">Show Answer Formulation</button>
+  // 1. Build the base container frame structure
+  container.innerHTML = `
+    <div class="flex-grow flex flex-col justify-between h-full">
+      <div>
+        <span class="text-[10px] uppercase tracking-widest font-mono bg-blue-900/60 border border-blue-700/40 text-blue-300 px-2 py-0.5 rounded">Standard Flashcard</span>
+        <h2 class="text-lg font-medium text-white mt-4 leading-relaxed">${card.question}</h2>
+      </div>
+      
+      <div id="answer-area" class="hidden flex-col w-full mt-6 bg-slate-900/40 border border-slate-700/50 rounded-xl p-4">
+        <div id="html-answer-target" class="text-sm text-slate-300 leading-relaxed"></div>
+        
+        <div class="grid grid-cols-3 gap-3 mt-6">
+          <button onclick="handleCardComplete(0)" class="px-3 py-2 bg-red-950/40 hover:bg-red-900 text-red-200 text-xs font-semibold rounded-lg transition-all border border-red-800/40">Badly (Re-queue)</button>
+          <button onclick="handleCardComplete(1)" class="px-3 py-2 bg-yellow-950/40 hover:bg-yellow-900 text-yellow-200 text-xs font-semibold rounded-lg transition-all border border-yellow-800/40">OK (Keep Loop)</button>
+          <button onclick="handleCardComplete(2)" class="px-3 py-2 bg-green-950/40 hover:bg-green-900 text-green-200 text-xs font-semibold rounded-lg transition-all border border-green-800/40">Well (Mastered)</button>
         </div>
-      `;
-      document.getElementById('show-btn').addEventListener('click', (e) => {
-        e.target.classList.add('hidden');
-        const ans = document.getElementById('answer-area');
-        ans.classList.remove('hidden');
-        ans.classList.add('flex');
-      });
-    }
+      </div>
+      
+      <button id="show-btn" class="mt-8 w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold tracking-wide transition-colors shadow-lg shadow-blue-900/30">Show Answer Formulation</button>
+    </div>
+  `;
+
+  // 2. Explicitly target the node and parse the raw HTML code from JSON
+  document.getElementById('html-answer-target').innerHTML = card.answer;
+
+  // 3. Keep your existing show-button logic intact
+  document.getElementById('show-btn').addEventListener('click', (e) => {
+    e.target.classList.add('hidden');
+    const ans = document.getElementById('answer-area');
+    ans.classList.remove('hidden');
+    ans.classList.add('flex');
+  });
+}
 
     // --- 2. MODE: MULTIPLE CHOICE OPTION PARSER ---
     function renderMultipleChoiceMode(card, container) {
