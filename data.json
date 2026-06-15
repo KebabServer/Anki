@@ -15,7 +15,7 @@
         "nodeId": "Facing_4Bet_OOP_001",
         "title": "Facing 4Bet OOP",
         "pot": "50.00 BB",
-        "communityCards": ["9c7cTd"],
+        "communityCards": ["9c","7c","Td"],
         "quizType": "poker_drag",
         "displayText": "All 3 sets on this board and AK misses. We need to be donking on this board.",
         "players": [
