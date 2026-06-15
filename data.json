@@ -161,11 +161,12 @@
         ],
         "choices": [
          {"hand": "Jh9h", "targetCategory": "Raise All In"},
-          {"hand": "QsJs", "targetCategory": "Raise All In"},
-          {"hand": "AcQc", "targetCategory": "Min-Raise"},
-          {"hand": "KcQc", "targetCategory": "Min-Raise"},
-          {"hand": "KdJd", "targetCategory": "Min-Raise"},
-          {"hand": "AdTd", "targetCategory": "Min-Raise"}
+         {"hand": "QsJs", "targetCategory": "Raise All In"},
+         {"hand": "AcQc", "targetCategory": "Min-Raise"},
+         {"hand": "KcQc", "targetCategory": "Min-Raise"},
+         {"hand": "KdJd", "targetCategory": "Min-Raise"},
+         {"hand": "AdTd", "targetCategory": "Min-Raise"},
+         {"hand": "Ac5c", "targetCategory": "Min-Raise"}
         ]
       }
  ]
