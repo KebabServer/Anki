@@ -17,7 +17,7 @@
         "pot": "50.00 BB",
         "communityCards": ["9c7cTd"],
         "quizType": "poker_drag",
-        "displayText": "The Button opens to 2.50 BB. Small Blind folds. Action shifts entirely to you in the Big Blind with effective stack metrics.",
+        "displayText": "All 3 sets on this board and AK misses. We need to be donking on this board.",
         "players": [
           {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
           {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
@@ -27,7 +27,7 @@
           {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
         ],
         "choices": [
-          {"hand": "KcTc", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "KcTc", "Ts9s", "targetCategory": "Donk 10.0 BB"},
           {"hand": "AhQh", "targetCategory": "Check"}
         ]
       }
