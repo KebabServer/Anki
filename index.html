@@ -344,6 +344,7 @@
     }
 
     // --- 4. MODE: ADVANCED POKER STRATEGY MATRIX (WITH EMBEDDED DYNAMIC TOGGLE) ---
+    // --- 4. MODE: ADVANCED POKER STRATEGY MATRIX (WITH CENTERED POT & CHIPS) ---
     function renderAdvancedPokerMode(card, container) {
       let playersHtml = '';
       let betsHtml = '';
@@ -384,7 +385,7 @@
 
       let communityCardsHtml = '';
       if (!card.communityCards || card.communityCards.length === 0) {
-        communityCardsHtml = `<span class="text-slate-500/50 font-mono text-[11px] font-bold tracking-widest border border-slate-700/40 px-3 py-1 bg-slate-900/30 rounded-md">PREFLOP RUNTIME</span>`;
+        communityCardsHtml = `<span class="text-slate-500/50 font-mono text-[10px] sm:text-[11px] font-bold tracking-widest border border-slate-700/40 px-3 py-1 bg-slate-900/30 rounded-md">PREFLOP RUNTIME</span>`;
       } else {
         communityCardsHtml = card.communityCards.map(parseCardHtml).join('');
       }
@@ -419,8 +420,16 @@
             <p class="text-xs text-slate-300 mb-3 leading-relaxed bg-slate-900/30 p-2.5 border border-slate-700/30 rounded-lg">${card.displayText}</p>
             
             <div class="poker-table-area ${isCompactMode ? 'compact' : ''}">
-              <div class="absolute top-2.5 right-4 bg-slate-950/80 text-[10px] border border-slate-800/80 font-bold text-yellow-400 px-2 py-0.5 rounded shadow-md z-10">Pot: ${card.pot}</div>
-              <div class="community-cards">${communityCardsHtml}</div>
+              
+              <div class="flex flex-col items-center gap-1.5 z-10">
+                <div class="community-cards">${communityCardsHtml}</div>
+                
+                <div class="flex items-center justify-center gap-2 bg-slate-950/80 text-[10px] sm:text-xs border border-slate-800/80 font-bold text-yellow-400 px-2 py-0.5 rounded-md shadow-md">
+                  ${generateChipStackHtml(card.pot)}
+                  <span>Pot: ${card.pot}</span>
+                </div>
+              </div>
+
               ${playersHtml}
               ${betsHtml}
             </div>
