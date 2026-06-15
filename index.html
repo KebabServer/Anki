@@ -30,7 +30,6 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
@@ -39,10 +38,10 @@
   <div class="wrapper" style="margin-bottom: 16px;">
     <div class="header-row">
       <div class="header-title">
-        <h1>🧠 Spaced Repetition Core Engine</h1>
-        <p>Automated Deck Loader & Performance Tracker</p>
+        <h1>🧠 Spaced Repetition Calendar Engine</h1>
+        <p>Automated SM-2 Scheduler & Strategy Performance Tracker</p>
       </div>
-      <span id="progress-text" class="progress-badge">0 / 0 Cards</span>
+      <span id="progress-text" class="progress-badge">0 / 0 Cards Due</span>
     </div>
     <div class="progress-track">
       <div id="progress-bar" class="progress-fill"></div>
@@ -65,7 +64,19 @@
       Reset Engine Memory
     </button>
   </div>
+
   <script>
+    // --- SECURITY & PROTECTION UTILITIES ---
+    function escapeHtml(string) {
+      if (!string) return '';
+      return String(string)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     // --- INTEGRATED SUIT MAP & RENDER LOGIC ---
     const SUIT_MAP = {
       'h': { className: 'hearts', symbol: '♥', color: '#dc2626' },
@@ -79,7 +90,7 @@
       const suitLetter = cardStr.slice(-1).toLowerCase();
       const value = cardStr.substring(0, cardStr.length - 1);
       const suitData = SUIT_MAP[suitLetter] || { className: '', symbol: '', color: '' };
-      return `<div class="card ${suitData.className}" data-suit="${suitLetter}"><span>${value}</span><span style="color: ${suitData.color}">${suitData.symbol}</span></div>`;
+      return `<div class="card ${suitData.className}" data-suit="${suitLetter}"><span>${escapeHtml(value)}</span><span style="color: ${suitData.color}">${suitData.symbol}</span></div>`;
     }
 
     function generateChipStackHtml(betString) {
@@ -175,36 +186,87 @@
     ];
 
     // --- APPLICATION CORE RUNTIME ARCHITECTURE ---
+    const MAX_INTERVAL_DAYS = 40;
+    const MIN_EASE_FACTOR = 1.3;
+
     let deck = [];
     let sessionQueue = [];
     let currentCard = null;
-    let stats = JSON.parse(localStorage.getItem('flashcard_engine_stats')) || {};
     let isCompactMode = true;
 
     let sessionTotal = 0;
     let sessionCompleted = 0;
     let draggedElement = null;
 
+    // --- INLINE LOCALSTORAGE SM-2 CALCULATOR ENGINE ---
+    function processCardSM2Direct(nodeId, responseQuality) {
+      let db = JSON.parse(localStorage.getItem('flashcard_engine_sm2_stats')) || {};
+      
+      let cardState = db[nodeId] || {
+        interval: 0,
+        easeFactor: 2.5,
+        repetitions: 0,
+        nextReviewDate: null
+      };
+
+      if (responseQuality === 0) {
+        cardState.repetitions = 0;
+        cardState.interval = 1; 
+        cardState.easeFactor = Math.max(MIN_EASE_FACTOR, cardState.easeFactor - 0.20);
+      } else {
+        if (cardState.repetitions === 0) {
+          cardState.interval = 1;
+        } else if (cardState.repetitions === 1) {
+          cardState.interval = 6;
+        } else {
+          cardState.interval = Math.round(cardState.interval * cardState.easeFactor);
+        }
+        cardState.repetitions++;
+
+        if (responseQuality === 2) {
+          cardState.easeFactor += 0.05;
+        } else if (responseQuality === 1) {
+          cardState.easeFactor = Math.max(MIN_EASE_FACTOR, cardState.easeFactor - 0.15);
+        }
+      }
+
+      if (cardState.interval > MAX_INTERVAL_DAYS) {
+        cardState.interval = MAX_INTERVAL_DAYS;
+      }
+
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + cardState.interval);
+      cardState.nextReviewDate = targetDate.toISOString();
+
+      db[nodeId] = cardState;
+      localStorage.setItem('flashcard_engine_sm2_stats', JSON.stringify(db));
+      return cardState;
+    }
+
     async function init() {
       try {
         const response = await fetch('data.json');
-        if (!response.ok) throw new Error('Network configuration lookup error.');
+        if (!response.ok) throw new Error('Network file tracking resolution exception.');
         deck = await response.json();
       } catch (error) {
-        console.warn('Fallback to internal repository.');
+        console.warn('Fallback to internal repository records active.');
         deck = fallbackDeck;
       }
 
-      sessionQueue = deck.filter(card => !stats[card.nodeId] || stats[card.nodeId] < 2);
+      const now = new Date();
+      const currentSavedStats = JSON.parse(localStorage.getItem('flashcard_engine_sm2_stats')) || {};
 
-      if (sessionQueue.length === 0) {
-        sessionQueue = [...deck];
-        stats = {};
-        localStorage.removeItem('flashcard_engine_stats');
-      }
+      // Calendar Filter: Find items never seen or due right now
+      sessionQueue = deck.filter(card => {
+        const cardProgress = currentSavedStats[card.nodeId];
+        if (!cardProgress || !cardProgress.nextReviewDate) return true;
+        const reviewDeadline = new Date(cardProgress.nextReviewDate);
+        return reviewDeadline <= now;
+      });
 
       sessionTotal = sessionQueue.length;
       sessionCompleted = 0;
+      
       initEngineUtilities(deck);
       updateProgress();
       nextCard();
@@ -219,7 +281,7 @@
           const typeLabel = card.quizType ? `[${card.quizType.toUpperCase()}]` : '[QUIZ]';
           const summaryText = card.question || card.title || card.displayText || `Item ${idx + 1}`;
           const truncatedSummary = summaryText.length > 45 ? summaryText.substring(0, 45) + '...' : summaryText;
-          return `<option value="${card.nodeId}">${typeLabel} ${truncatedSummary}</option>`;
+          return `<option value="${escapeHtml(card.nodeId)}">${escapeHtml(typeLabel)} ${escapeHtml(truncatedSummary)}</option>`;
         }).join('');
 
         selector.addEventListener('change', (e) => {
@@ -227,7 +289,6 @@
           const targetCard = deck.find(c => c.nodeId === targetNodeId);
           if (targetCard) {
             currentCard = targetCard;
-            // Remote jump breaks execution tracking; pull out of running standard flow safely
             const container = document.getElementById('card-container');
             renderCardRouter(currentCard, container);
           }
@@ -236,8 +297,8 @@
 
       if (resetBtn) {
         resetBtn.addEventListener('click', () => {
-          if (confirm("Permanently wipe local storage execution tracking logs?")) {
-            localStorage.removeItem('flashcard_engine_stats');
+          if (confirm("Permanently wipe local storage SM-2 historical matrix logs?")) {
+            localStorage.removeItem('flashcard_engine_sm2_stats');
             window.location.reload();
           }
         });
@@ -245,20 +306,16 @@
     }
 
     function updateProgress() {
-      document.getElementById('progress-text').innerText = `${sessionCompleted} / ${sessionTotal} Cards Handled`;
+      document.getElementById('progress-text').innerText = `${sessionCompleted} / ${sessionTotal} Session Cards Handled`;
       const pct = sessionTotal === 0 ? 0 : (sessionCompleted / sessionTotal) * 100;
       document.getElementById('progress-bar').style.width = `${pct}%`;
     }
 
-    function saveProgress(nodeId, masteryValue) {
-      stats[nodeId] = masteryValue;
-      localStorage.setItem('flashcard_engine_stats', JSON.stringify(stats));
-    }
+    function handleCardComplete(scoreValue) {
+      processCardSM2Direct(currentCard.nodeId, scoreValue);
 
-    function handleCardComplete(masteryValue) {
-      saveProgress(currentCard.nodeId, masteryValue);
-      if (masteryValue === 0) {
-        sessionQueue.push(currentCard);
+      if (scoreValue === 0) {
+        sessionQueue.push(currentCard); // Re-queue at the end of the current run array
       } else {
         sessionCompleted++;
       }
@@ -275,8 +332,9 @@
         container.innerHTML = `
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 48px 0; flex-grow: 1;">
             <div style="background: rgba(20,83,45,0.4); padding: 16px; border-radius: 9999px; border: 1px solid rgba(34,197,94,0.3); margin-bottom: 16px; font-size: 24px;">🎯</div>
-            <h2 style="font-size: 24px; font-weight: 700; color: #4ade80; margin: 0 0 8px 0;">Deck Pipeline Evaluated!</h2>
-            <button onclick="localStorage.removeItem('flashcard_engine_stats'); location.reload();" style="margin-top: 24px; padding: 8px 16px; background: #475569; border: none; color: white; border-radius: 4px; cursor: pointer;">Reset Cache</button>
+            <h2 style="font-size: 24px; font-weight: 700; color: #4ade80; margin: 0 0 8px 0;">All Due Cards Checked!</h2>
+            <p style="color: #cbd5e1; font-size: 14px; margin-top: 0;">Spaced Repetition boundaries satisfied. Check back later.</p>
+            <button onclick="localStorage.removeItem('flashcard_engine_sm2_stats'); location.reload();" style="margin-top: 24px; padding: 8px 16px; background: #475569; border: none; color: white; border-radius: 4px; cursor: pointer;">Reset Engine Memory</button>
           </div>
         `;
         return;
@@ -294,24 +352,30 @@
         case 'multiple_choice': return renderMultipleChoiceMode(card, container);
         case 'drag_drop': return renderStandardDragDropMode(card, container);
         case 'poker_drag': return renderAdvancedPokerMode(card, container);
-        default: container.innerHTML = `<p style="color: #f87171; padding: 16px;">Unknown execution layout mapping.</p>`;
+        default: container.innerHTML = `<p style="color: #f87171; padding: 16px;">Unknown execution routing context.</p>`;
       }
     }
 
     // --- 1. MODE: STANDARD ANKI RATING FLASHCARD ---
     function renderAnkiMode(card, container) {
+      const db = JSON.parse(localStorage.getItem('flashcard_engine_sm2_stats')) || {};
+      const state = db[card.nodeId] || { interval: 0, easeFactor: 2.5, repetitions: 0 };
+      
+      const nextGoodDays = state.repetitions === 0 ? 1 : (state.repetitions === 1 ? 6 : Math.min(40, Math.round(state.interval * state.easeFactor)));
+      const nextEasyDays = state.repetitions === 0 ? 1 : (state.repetitions === 1 ? 6 : Math.min(40, Math.round(state.interval * (state.easeFactor + 0.05))));
+
       container.innerHTML = `
         <div class="flex-col-layout">
           <div>
             <span class="badge badge-blue">Standard Flashcard</span>
-            <h2 style="font-size: 1.125rem; font-weight: 500; color: white; margin-top: 16px; line-height: 1.6;">${card.question}</h2>
+            <h2 style="font-size: 1.125rem; font-weight: 500; color: white; margin-top: 16px; line-height: 1.6;">${escapeHtml(card.question)}</h2>
           </div>
           <div id="answer-area" class="hidden" style="flex-direction: column; width: 100%; margin-top: 24px; background: rgba(15,23,42,0.4); border: 1px solid rgba(51,65,85,0.5); border-radius: 12px; padding: 16px; box-sizing: border-box;">
-            <div style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom:16px;">${card.answer}</div>
+            <div style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom:16px;">${escapeHtml(card.answer)}</div>
             <div class="grid-3-col">
-              <button onclick="handleCardComplete(0)" class="btn-rating btn-rate-bad">Badly (Re-queue)</button>
-              <button onclick="handleCardComplete(1)" class="btn-rating btn-rate-ok">OK (Keep Loop)</button>
-              <button onclick="handleCardComplete(2)" class="btn-rating btn-rate-well">Well (Mastered)</button>
+              <button onclick="handleCardComplete(0)" class="btn-rating btn-rate-bad">Again (1d)</button>
+              <button onclick="handleCardComplete(1)" class="btn-rating btn-rate-ok">Good (${nextGoodDays}d)</button>
+              <button onclick="handleCardComplete(2)" class="btn-rating btn-rate-well">Easy (${nextEasyDays}d)</button>
             </div>
           </div>
           <button id="show-btn" class="btn-primary" style="margin-top: 32px;">Show Answer Formulation</button>
@@ -328,15 +392,16 @@
 
     // --- 2. MODE: MULTIPLE CHOICE OPTION PARSER ---
     function renderMultipleChoiceMode(card, container) {
-      const optionsHtml = card.options.map((opt, i) =>
-        `<button data-idx="${i}" class="mc-btn"><span class="mc-prefix">${String.fromCharCode(65 + i)}</span> <span>${opt.text || opt}</span></button>`
-      ).join('');
+      const optionsHtml = card.options.map((opt, i) => {
+        const optionText = opt.text || opt;
+        return `<button data-idx="${i}" class="mc-btn"><span class="mc-prefix">${String.fromCharCode(65 + i)}</span> <span>${escapeHtml(optionText)}</span></button>`;
+      }).join('');
 
       container.innerHTML = `
         <div class="flex-col-layout">
           <div>
             <span class="badge badge-indigo">Multiple Choice</span>
-            <h2 style="font-size: 1.125rem; font-weight: 500; color: white; margin: 16px 0 24px 0; line-height: 1.6;">${card.question}</h2>
+            <h2 style="font-size: 1.125rem; font-weight: 500; color: white; margin: 16px 0 24px 0; line-height: 1.6;">${escapeHtml(card.question)}</h2>
             <div class="mc-options-list" id="mc-options">${optionsHtml}</div>
           </div>
           <button id="mc-next" class="hidden btn-primary" style="margin-top: 24px;">Advance Deck Loop</button>
@@ -374,13 +439,13 @@
       const categories = [...new Set(card.choices.map(c => c.targetCategory))];
 
       let draggablesHtml = card.choices.map((c, i) =>
-        `<div draggable="true" data-target="${c.targetCategory}" id="dd-item-${i}" class="draggable-item" ondragstart="dragStart(event)">${c.text}</div>`
+        `<div draggable="true" data-target="${escapeHtml(c.targetCategory)}" id="dd-item-${i}" class="draggable-item" ondragstart="dragStart(event)">${escapeHtml(c.text)}</div>`
       ).join('');
 
       let dropzonesHtml = categories.map(cat => `
         <div class="dropzone-column">
-          <h3 class="dropzone-title">${cat}</h3>
-          <div data-cat="${cat}" class="dropzone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
+          <h3 class="dropzone-title">${escapeHtml(cat)}</h3>
+          <div data-cat="${escapeHtml(cat)}" class="dropzone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
         </div>
       `).join('');
 
@@ -388,7 +453,7 @@
         <div class="flex-col-layout">
           <div>
             <span class="badge badge-purple">Categorized Sorting</span>
-            <h2 style="font-size: 1rem; font-weight: 500; color: #e2e8f0; margin: 12px 0 16px 0; line-height: 1.6;">${card.question}</h2>
+            <h2 style="font-size: 1rem; font-weight: 500; color: #e2e8f0; margin: 12px 0 16px 0; line-height: 1.6;">${escapeHtml(card.question)}</h2>
             <div id="source-zone" class="source-box" ondragover="dragOver(event)" ondrop="dropSource(event)">${draggablesHtml}</div>
             <div class="drag-container">${dropzonesHtml}</div>
           </div>
@@ -417,19 +482,19 @@
         const heroLabel = player.isHero ? '<span class="hero-label">(H)</span>' : '';
 
         playersHtml += `
-          <div class="player-seat seat-${player.position} ${isTurnClass} ${isActiveClass}">
+          <div class="player-seat seat-${escapeHtml(player.position)} ${isTurnClass} ${isActiveClass}">
             ${dealerButtonHtml}
-            <div class="player-position">${player.position}${heroLabel}</div>
-            <div class="player-stack">${player.stackSize}</div>
+            <div class="player-position">${escapeHtml(player.position)}${heroLabel}</div>
+            <div class="player-stack">${escapeHtml(player.stackSize)}</div>
             <div class="hole-cards">${holeCardsHtml}</div>
           </div>
         `;
 
         if (parseFloat(player.currentBet) > 0) {
           betsHtml += `
-            <div class="bet-indicator bet-${player.position}">
+            <div class="bet-indicator bet-${escapeHtml(player.position)}">
               ${generateChipStackHtml(player.currentBet)}
-              <span>${player.currentBet}</span>
+              <span>${escapeHtml(player.currentBet)}</span>
             </div>
           `;
         }
@@ -448,16 +513,16 @@
         const look = SUIT_MAP[suitLetter] || { symbol: suitLetter, color: '#f1f5f9' };
 
         return `
-          <div draggable="true" data-target="${c.targetCategory}" id="poker-item-${i}" class="draggable-token" ondragstart="dragStart(event)">
-            ${rawValue}<span style="color: ${look.color}; margin-left: 2px; font-size: 1.1em;">${look.symbol}</span>
+          <div draggable="true" data-target="${escapeHtml(c.targetCategory)}" id="poker-item-${i}" class="draggable-token" ondragstart="dragStart(event)">
+            ${escapeHtml(rawValue)}<span style="color: ${look.color}; margin-left: 2px; font-size: 1.1em;">${look.symbol}</span>
           </div>
         `;
       }).join('');
 
       let dropzonesHtml = categories.map(cat => `
         <div class="dropzone-container">
-          <h3 class="dropzone-header">${cat}</h3>
-          <div data-cat="${cat}" class="dropzone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
+          <h3 class="dropzone-header">${escapeHtml(cat)}</h3>
+          <div data-cat="${escapeHtml(cat)}" class="dropzone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
         </div>
       `).join('');
 
@@ -467,20 +532,20 @@
             <div class="header-container">
               <div>
                 <span class="badge-engine">Poker Matrix Engine</span>
-                <h2 class="header-title">${card.title || 'Game Matrix Checkpoint'}</h2>
+                <h2 class="header-title">${escapeHtml(card.title || 'Game Matrix Checkpoint')}</h2>
               </div>
               <div class="toggle-container">
                 <input type="checkbox" id="compact-toggle" ${isCompactMode ? 'checked' : ''} class="toggle-input">
                 <label for="compact-toggle" class="toggle-label">Compact Engine Table</label>
               </div>
             </div>
-            <p class="display-text">${card.displayText}</p>
+            <p class="display-text">${escapeHtml(card.displayText)}</p>
             <div class="poker-table-area ${isCompactMode ? 'compact' : ''}">
               <div class="center-board">
                 <div class="community-cards">${communityCardsHtml}</div>
                 <div class="pot-display">
                   ${generateChipStackHtml(card.pot)}
-                  <span>Pot: ${card.pot}</span>
+                  <span>Pot: ${escapeHtml(card.pot)}</span>
                 </div>
               </div>
               ${playersHtml}
@@ -563,6 +628,7 @@
 
       if (localizedDropzonesCount === expectedTotal) {
         nextActionBtn.classList.remove('hidden');
+        // Structural Bug Fix: If flawed, score becomes 0 to force a full local re-queue loop!
         nextActionBtn.onclick = () => handleCardComplete(perfectScoreValidated ? 2 : 0);
       } else {
         nextActionBtn.classList.add('hidden');
@@ -570,7 +636,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', init);
-</script>
+  </script>
 </body>
 
 </html>
