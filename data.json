@@ -23,12 +23,12 @@
           {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
           {"position": "CO", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
           {"position": "BTN", "isActive": true, "isTurn": false, "stackSize": "198.61 BB", "currentBet": "0.00 BB"},
-          {"position": "SB", "isActive": true, "isTurn": true, "stackSize": "113.88 BB", "currentBet": "0.00 BB", "holeCards": ["Kc", "Tc"], "isHero": true},
+          {"position": "SB", "isActive": true, "isTurn": true, "stackSize": "113.88 BB", "currentBet": "0.00 BB", "isHero": true},
           {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
         ],
         "choices": [
-          {"hand": "AhKh", "targetCategory": "Raise/3-Bet"},
-          {"hand": "2h2d", "targetCategory": "Call"}
+          {"hand": "KcTc", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "AhQh", "targetCategory": "Check"}
         ]
       }
  ]
