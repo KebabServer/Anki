@@ -9,11 +9,7 @@
     "nodeId": "Facing_4Bet_OOP_Donking",
     "quizType": "anki",
     "question": "Facing 4Bet OOP:\n When do we want to construct a donking range?\n What mistakes to avoid when constructing a leading range?",
-    "answer": "Your cold call range has flopped multiple sets.\n
-   Your opponent is likely check back (AK combos have missed the board)\n
-   Your hand class has a clear answer vs raise\n
-   Don't lead/fold lots of equity hands\n
-   Don't lead complete trash"   
+    "answer": "Your cold call range has flopped multiple sets.\n Your opponent is likely check back (AK combos have missed the board)\n Your hand class has a clear answer vs raise\n Don't lead/fold lots of equity hands\n Don't lead complete trash"   
   },
   {
         "nodeId": "poker_demo_001",
