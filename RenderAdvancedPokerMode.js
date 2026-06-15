@@ -242,7 +242,7 @@ function renderAdvancedPokerMode(card, container) {
         vertical-align: middle;
         user-select: none;
         display: flex;
-        items-center: center;
+        align-items: center;
         justify-content: center;
         letter-spacing: 0.025em;
         min-width: 70px;
@@ -290,22 +290,29 @@ function renderAdvancedPokerMode(card, container) {
         min-height: 85px;
       }
       .btn-confirm {
-        display: none;
         margin-top: 1.25rem;
         width: 100%;
         padding-top: 0.75rem;
         padding-bottom: 0.75rem;
         background-color: #2563eb;
         border-radius: 0.5rem;
+        color: #ffffff;
         font-size: 0.875rem;
         font-weight: 700;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
         transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         transition-duration: 150ms;
+        border: none;
+        cursor: pointer;
       }
       .btn-confirm:hover {
         background-color: #3b82f6;
+      }
+      
+      /* Explicit utility mapping for dynamic visibility rules */
+      .hidden {
+        display: none !important;
       }
 
       /* --- BASE/STANDARD CORE STYLES --- */
@@ -382,7 +389,7 @@ function renderAdvancedPokerMode(card, container) {
         <div class="dropzones-wrapper">${dropzonesHtml}</div>
       </div>
       
-      <button id="dd-next" class="btn-confirm">Confirm Strategic Configuration</button>
+      <button id="dd-next" class="btn-confirm hidden">Confirm Strategic Configuration</button>
     </div>
   `;
 
