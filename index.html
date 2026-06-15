@@ -249,7 +249,7 @@
           </div>
           
           <div id="answer-area" class="hidden flex-col w-full mt-6 bg-slate-900/40 border border-slate-700/50 rounded-xl p-4">
-            <p class="text-sm text-slate-300 leading-relaxed">${card.answer}</p>
+            <div class="text-sm text-slate-300 leading-relaxed">${card.answer}</div>
             <div class="grid grid-cols-3 gap-3 mt-6">
               <button onclick="handleCardComplete(0)" class="px-3 py-2 bg-red-950/40 hover:bg-red-900 text-red-200 text-xs font-semibold rounded-lg transition-all border border-red-800/40">Badly (Re-queue)</button>
               <button onclick="handleCardComplete(1)" class="px-3 py-2 bg-yellow-950/40 hover:bg-yellow-900 text-yellow-200 text-xs font-semibold rounded-lg transition-all border border-yellow-800/40">OK (Keep Loop)</button>
