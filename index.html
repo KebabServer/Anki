@@ -1,322 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Advanced Spaced Repetition</title>
+  <title>Advanced Spaced Repetition & Strategy Deck Engine</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
   <style>
-    /* Poker Table Surface */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    
+    .fade-enter { animation: fadeIn 0.25s ease-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .drag-active { border-color: #3b82f6 !important; background-color: rgba(59, 130, 246, 0.15) !important; }
+    
+    /* Common Poker Table Styles */
     .poker-table-area {
       position: relative;
       width: 100%;
-      height: 320px;
-      background: radial-gradient(ellipse, #0f766e, #064e3b);
-      border: 12px solid #1e293b;
-      border-radius: 160px;
+      background: radial-gradient(ellipse at center, #0f766e 0%, #064e3b 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 2rem 0;
-      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6), 0 10px 20px rgba(0, 0, 0, 0.3);
+      margin: 1.5rem 0;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.7), 0 10px 25px rgba(0,0,0,0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Cards */
-    .community-cards {
-      display: flex;
-      gap: 8px;
-      z-index: 10;
-    }
-
+    /* Common Card Styles */
+    .community-cards { display: flex; gap: 6px; z-index: 10; transition: all 0.3s; }
     .card {
-      width: 36px;
-      height: 52px;
       background: white;
       border-radius: 4px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      font-size: 14px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      border: 1px solid #ccc;
+      font-weight: 700;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
       line-height: 1.1;
+      user-select: none;
+      transition: all 0.3s;
     }
+    .card.hearts, .card.diamonds { color: #dc2626; }
+    .card.clubs, .card.spades { color: #0f172a; }
+    .card-back { background: repeating-linear-gradient(45deg, #1d4ed8, #1d4ed8 4px, #1e40af 4px, #1e40af 8px); border: 1px solid #93c5fd; }
 
-    .card.hearts,
-    .card.diamonds {
-      color: #dc2626;
-    }
-
-    .card.clubs,
-    .card.spades {
-      color: #0f172a;
-    }
-
-    .card-back {
-      background: repeating-linear-gradient(45deg, #1e40af, #1e40af 5px, #1e3a8a 5px, #1e3a8a 10px);
-    }
-
-    /* Seats & Dealer Button */
+    /* Common Player Seat Configurations */
     .player-seat {
       position: absolute;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 6px 12px;
-      border-radius: 8px;
-      background: #334155;
+      background: #1e293b;
       border: 2px solid #475569;
-      font-size: 12px;
-      transition: all 0.3s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 20;
-      min-width: 80px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
     }
-
-    .player-seat.active-turn {
-      box-shadow: 0 0 15px #facc15;
-      border-color: #facc15;
-    }
-
-    .player-seat.inactive {
-      opacity: 0.4;
-    }
-
-    .player-seat .hole-cards {
-      display: flex;
-      gap: 4px;
-      margin-top: 6px;
-    }
-
+    .player-seat.active-turn { box-shadow: 0 0 20px #eab308; border-color: #eab308; }
+    .player-seat.inactive { opacity: 0.3; filter: grayscale(30%); }
+    .player-seat .hole-cards { display: flex; transition: all 0.3s; }
+    
     .dealer-button {
       position: absolute;
-      top: -10px;
-      left: -10px;
-      width: 20px;
-      height: 20px;
       background: #f8fafc;
-      color: #000;
+      color: #0f172a;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
       font-weight: 900;
-      border: 1px solid #475569;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      border: 1px solid #64748b;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
       z-index: 25;
+      user-select: none;
     }
 
-    /* Chip Stacks & Bets */
+    /* Common Chip Stack Indicators */
     .bet-indicator {
       position: absolute;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      font-size: 11px;
-      font-weight: bold;
-      color: #cbd5e1;
+      font-weight: 700;
+      color: #f1f5f9;
       z-index: 15;
+      background: rgba(15, 23, 42, 0.75);
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    .chip-stack {
-      position: relative;
-      width: 20px;
-      height: 10px;
-      margin-bottom: 20px;
-    }
-
+    .chip-stack { position: relative; }
     .poker-chip {
       position: absolute;
       left: 0;
-      width: 20px;
-      height: 6px;
       border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+      border: 0.5px solid rgba(255,255,255,0.4);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
 
-    /* 6-Max Geometric Layout Constraints */
-    .seat-UTG {
-      top: 40%;
-      left: -30px;
-      transform: translateY(-50%);
+    /* --- VIEW MODE 1: STANDARD/LARGE RULES --- */
+    .poker-table-area:not(.compact) {
+      height: 340px;
+      border: 14px solid #1e293b;
+      border-radius: 170px;
     }
+    .poker-table-area:not(.compact) .card {
+      width: 38px; height: 54px; font-size: 14px; border: 1px solid #cbd5e1;
+    }
+    .poker-table-area:not(.compact) .player-seat {
+      padding: 6px 12px; border-radius: 10px; font-size: 12px; min-width: 90px;
+    }
+    .poker-table-area:not(.compact) .player-seat .hole-cards { gap: 4px; margin-top: 6px; }
+    .poker-table-area:not(.compact) .dealer-button {
+      top: -10px; left: -10px; width: 22px; height: 22px; font-size: 11px;
+    }
+    .poker-table-area:not(.compact) .bet-indicator {
+      flex-direction: column; font-size: 11px; padding: 3px 6px; gap: 2px;
+    }
+    .poker-table-area:not(.compact) .chip-stack { width: 22px; height: 12px; }
+    .poker-table-area:not(.compact) .poker-chip { width: 22px; height: 6px; }
 
-    .seat-HJ {
-      top: -20px;
-      left: 20%;
-    }
+    /* Large Seating Placements */
+    .poker-table-area:not(.compact) .seat-UTG { top: 40%; left: -35px; transform: translateY(-50%); }
+    .poker-table-area:not(.compact) .seat-HJ  { top: -25px; left: 22%; }
+    .poker-table-area:not(.compact) .seat-CO  { top: -25px; right: 22%; }
+    .poker-table-area:not(.compact) .seat-BTN { top: 40%; right: -35px; transform: translateY(-50%); }
+    .poker-table-area:not(.compact) .seat-SB  { bottom: -25px; right: 22%; }
+    .poker-table-area:not(.compact) .seat-BB  { bottom: -25px; left: 22%; }
 
-    .seat-CO {
-      top: -20px;
-      right: 20%;
-    }
+    /* Large Bet Positions */
+    .poker-table-area:not(.compact) .bet-UTG  { top: 40%; left: 85px; transform: translateY(-50%); }
+    .poker-table-area:not(.compact) .bet-HJ   { top: 65px; left: 26%; }
+    .poker-table-area:not(.compact) .bet-CO   { top: 65px; right: 26%; }
+    .poker-table-area:not(.compact) .bet-BTN  { top: 40%; right: 85px; transform: translateY(-50%); }
+    .poker-table-area:not(.compact) .bet-SB   { bottom: 65px; right: 26%; }
+    .poker-table-area:not(.compact) .bet-BB   { bottom: 65px; left: 26%; }
 
-    .seat-BTN {
-      top: 40%;
-      right: -30px;
-      transform: translateY(-50%);
-    }
 
-    .seat-SB {
-      bottom: -20px;
-      right: 20%;
+    /* --- VIEW MODE 2: COMPACT RULES --- */
+    .poker-table-area.compact {
+      height: 190px;
+      border: 8px solid #1e293b;
+      border-radius: 95px;
     }
+    .poker-table-area.compact .card {
+      width: 26px; height: 36px; font-size: 11px; border: 0.5px solid #e2e8f0;
+    }
+    .poker-table-area.compact .player-seat {
+      padding: 2px 6px; border-radius: 6px; font-size: 9px; min-width: 65px; border-width: 1px;
+    }
+    .poker-table-area.compact .player-seat .hole-cards { gap: 2px; margin-top: 2px; }
+    .poker-table-area.compact .dealer-button {
+      top: -6px; left: -6px; width: 16px; height: 16px; font-size: 9px;
+    }
+    .poker-table-area.compact .bet-indicator {
+      flex-direction: row; font-size: 9px; padding: 1px 4px; gap: 4px;
+    }
+    .poker-table-area.compact .chip-stack { width: 14px; height: 6px; }
+    .poker-table-area.compact .poker-chip { width: 14px; height: 3px; }
 
-    .seat-BB {
-      bottom: -20px;
-      left: 20%;
-    }
+    /* Compact Seating Placements */
+    .poker-table-area.compact .seat-UTG { top: 40%; left: 8px; transform: translateY(-50%); }
+    .poker-table-area.compact .seat-HJ  { top: 6px; left: 26%; }
+    .poker-table-area.compact .seat-CO  { top: 6px; right: 26%; }
+    .poker-table-area.compact .seat-BTN { top: 40%; right: 8px; transform: translateY(-50%); }
+    .poker-table-area.compact .seat-SB  { bottom: 6px; right: 26%; }
+    .poker-table-area.compact .seat-BB  { bottom: 6px; left: 26%; }
 
-    .bet-UTG {
-      top: 40%;
-      left: 70px;
-      transform: translateY(-50%);
-    }
-
-    .bet-HJ {
-      top: 60px;
-      left: 25%;
-    }
-
-    .bet-CO {
-      top: 60px;
-      right: 25%;
-    }
-
-    .bet-BTN {
-      top: 40%;
-      right: 70px;
-      transform: translateY(-50%);
-    }
-
-    .bet-SB {
-      bottom: 60px;
-      right: 25%;
-    }
-
-    .bet-BB {
-      bottom: 60px;
-      left: 25%;
-    }
-  </style>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-
-    .fade-enter {
-      animation: fadeIn 0.3s ease-in forwards;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .drag-active {
-      border-color: #3b82f6 !important;
-      background-color: rgba(59, 130, 246, 0.1);
-    }
-
-    .poker-table {
-      background: radial-gradient(circle, #065f46 0%, #022c22 100%);
-    }
+    /* Compact Bet Positions */
+    .poker-table-area.compact .bet-UTG  { top: 40%; left: 90px; transform: translateY(-50%); }
+    .poker-table-area.compact .bet-HJ   { top: 48px; left: 30%; }
+    .poker-table-area.compact .bet-CO   { top: 48px; right: 30%; }
+    .poker-table-area.compact .bet-BTN  { top: 40%; right: 90px; transform: translateY(-50%); }
+    .poker-table-area.compact .bet-SB   { bottom: 48px; right: 30%; }
+    .poker-table-area.compact .bet-BB   { bottom: 48px; left: 30%; }
   </style>
 </head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center p-3 sm:p-6 select-none">
 
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center p-4 sm:p-8">
-
-  <div class="w-full max-w-3xl mb-6">
+  <div class="w-full max-w-3xl mb-4">
     <div class="flex justify-between items-end mb-2">
-      <h1 class="text-2xl font-bold tracking-tight text-white">Quiz Session</h1>
-      <span id="progress-text" class="text-sm text-slate-400">0 / 0 Cards</span>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          <span>🧠 Spaced Repetition Core Engine</span>
+        </h1>
+        <p class="text-xs text-slate-400 mt-0.5">Automated Deck Loader & Performance Tracker</p>
+      </div>
+      <span id="progress-text" class="text-xs font-mono bg-slate-800 border border-slate-700 px-2 py-1 rounded text-slate-300">0 / 0 Cards</span>
     </div>
-    <div class="w-full bg-slate-800 rounded-full h-2.5">
-      <div id="progress-bar" class="bg-blue-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+    <div class="w-full bg-slate-800 rounded-full h-2 border border-slate-700/50 overflow-hidden">
+      <div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
     </div>
   </div>
 
-  <div id="card-container"
-    class="w-full max-w-3xl bg-slate-800 rounded-xl shadow-2xl p-6 sm:p-8 min-h-[400px] flex flex-col relative fade-enter">
-    <div class="flex items-center justify-center h-full text-slate-400">Loading deck...</div>
+  <div id="card-container" class="w-full max-w-3xl bg-slate-800/90 border border-slate-700 rounded-xl shadow-2xl p-5 sm:p-6 min-h-[460px] flex flex-col justify-between relative fade-enter">
+    <div class="flex flex-col items-center justify-center h-full my-auto text-slate-400 gap-2">
+      <div class="animate-spin rounded-full h-8 w-8 border-2 border-slate-500 border-t-transparent"></div>
+      <p class="text-sm font-medium">Resolving System State & Parsing Deck Arrays...</p>
+    </div>
   </div>
 
   <script>
-    /** * DATA ARCHITECTURE & MOCK DATA
-     * In a real deployment, this loads from data.json. 
-     * Mock data is provided here as a fallback to ensure the app runs immediately.
-     */
-    const fallbackDeck = [
-      {
-        "nodeId": "preflop_001",
-        "title": "BB Defense vs BTN Open",
-        "phase": "PREFLOP",
-        "pot": "3.50 BB",
-        "communityCards": ["As", "Ah", "Kc"],
-        "quizType": "poker_drag",
-        "displayText": "The BTN opens to 2.5 BB. Action is on you in the Big Blind.",
-        "players": [
-          { "position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100 BB", "currentBet": "0 BB" },
-          { "position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100 BB", "currentBet": "0 BB" },
-          { "position": "CO", "isActive": false, "isTurn": false, "stackSize": "100 BB", "currentBet": "0 BB" },
-          { "position": "BTN", "isActive": true, "isTurn": false, "stackSize": "100 BB", "currentBet": "2.50 BB" },
-          { "position": "SB", "isActive": false, "isTurn": false, "stackSize": "99.50 BB", "currentBet": "0.50 BB" },
-          { "position": "BB", "isActive": true, "isTurn": true, "stackSize": "89.00 BB", "currentBet": "1.00 BB", "holeCards": ["Ah", "Kh"], "isHero": true }
-        ],
-        "choices": [
-          { "hand": "AhKh", "targetCategory": "Raise/3-Bet" },
-          { "hand": "2h2d", "targetCategory": "Call" }
-        ]
-      },
-      {
-        "nodeId": "anki_001",
-        "quizType": "anki",
-        "question": "What is the capital of Finland?",
-        "answer": "Helsinki"
-      },
-      {
-        "nodeId": "mc_001",
-        "quizType": "multiple_choice",
-        "question": "Which array method adds an element to the end of an array in JavaScript?",
-        "options": ["shift()", "push()", "pop()", "unshift()"],
-        "correctIndex": 1
-      },
-      {
-        "nodeId": "drag_001",
-        "quizType": "drag_drop",
-        "question": "Sort these frontend technologies:",
-        "choices": [
-          { "text": "React", "targetCategory": "Framework/Library" },
-          { "text": "CSS", "targetCategory": "Styling" },
-          { "text": "Tailwind", "targetCategory": "Styling" },
-          { "text": "Vue", "targetCategory": "Framework/Library" }
-        ]
-      }
-    ];
-
-
-
-    // --- APPLICATION STATE ---
-    let deck = [];
-    let sessionQueue = [];
-    let currentCard = null;
-    let stats = JSON.parse(localStorage.getItem('flashcard_stats')) || {};
-    let sessionTotal = 0;
-    let sessionCompleted = 0;
-
-    // --- INITIALIZATION ---
+    // --- INTEGRATED SUIT MAP & RENDER LOGIC ---
     const SUIT_MAP = {
       'h': { className: 'hearts', symbol: '♥' },
       'd': { className: 'diamonds', symbol: '♦' },
@@ -324,25 +214,139 @@
       's': { className: 'spades', symbol: '♠' }
     };
 
+    function parseCardHtml(cardStr) {
+      if (cardStr === '??' || !cardStr) return `<div class="card card-back"></div>`;
+      const suitLetter = cardStr.slice(-1).toLowerCase();
+      const value = cardStr.substring(0, cardStr.length - 1);
+      const suitData = SUIT_MAP[suitLetter] || { className: '', symbol: '' };
+      return `<div class="card ${suitData.className}"><span>${value}</span><span>${suitData.symbol}</span></div>`;
+    }
+
+    function generateChipStackHtml(betString) {
+      const numVal = parseFloat(betString);
+      if (isNaN(numVal) || numVal <= 0) return '';
+
+      let chipColor = '#cbd5e1';
+      if (numVal >= 1 && numVal < 2.5) chipColor = '#ef4444';
+      if (numVal >= 2.5 && numVal < 10) chipColor = '#3b82f6';
+      if (numVal >= 10) chipColor = '#334155';
+
+      let dynamicStackCount = 1;
+      if (numVal > 1.5) dynamicStackCount = 2;
+      if (numVal >= 2.5) dynamicStackCount = 3;
+      if (numVal >= 8) dynamicStackCount = 4;
+      if (numVal >= 11) dynamicStackCount = 5;
+
+      let htmlString = '<div class="chip-stack">';
+      for (let i = 0; i < dynamicStackCount; i++) {
+        htmlString += `<div class="poker-chip" style="background: ${chipColor}; bottom: ${i * 2}px; z-index: ${i};"></div>`;
+      }
+      return htmlString + '</div>';
+    }
+
+    // --- FALLBACK INTERNAL REPOSITORY (Used if data.json fetch fails/CORS) ---
+    const fallbackDeck = [
+      {
+        "nodeId": "anki_demo_001",
+        "quizType": "anki",
+        "question": "Explain the architectural difference between a Monolith and Microservices.",
+        "answer": "A Monolith executes all computing layers inside a unified process pipeline. Microservices isolate distinct operational domains into decoupled, independently deployable services cooperating over safe REST APIs or message brokers."
+      },
+      {
+        "nodeId": "poker_demo_001",
+        "title": "BB Defense vs BTN Open Strategy Matrix",
+        "phase": "PREFLOP",
+        "pot": "3.50 BB",
+        "communityCards": [],
+        "quizType": "poker_drag",
+        "displayText": "The Button opens to 2.50 BB. Small Blind folds. Action shifts entirely to you in the Big Blind with effective stack metrics.",
+        "players": [
+          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "BTN", "isActive": true, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "2.50 BB"},
+          {"position": "SB", "isActive": false, "isTurn": false, "stackSize": "99.50 BB", "currentBet": "0.50 BB"},
+          {"position": "BB", "isActive": true, "isTurn": true, "stackSize": "89.00 BB", "currentBet": "1.00 BB", "holeCards": ["Ah", "Kh"], "isHero": true}
+        ],
+        "choices": [
+          {"hand": "AhKh", "targetCategory": "Raise/3-Bet"},
+          {"hand": "2h2d", "targetCategory": "Call"}
+        ]
+      },
+      {
+        "nodeId": "mc_demo_001",
+        "quizType": "multiple_choice",
+        "question": "Which of the following describes an idempotent API method execution footprint?",
+        "options": [
+          "Every execution modifies server memory state deterministically.",
+          "Making multiple identical requests has the same side-effect profile as a single request.",
+          "The method guarantees encryption handling routines via SSL headers.",
+          "Requests always return cached values without executing database calls."
+        ],
+        "correctIndex": 1
+      },
+      {
+        "nodeId": "drag_demo_001",
+        "quizType": "drag_drop",
+        "question": "Sort these technical technologies into their proper infrastructure layers:",
+        "choices": [
+          { "text": "Tailwind CSS", "targetCategory": "UI / Client Layer" },
+          { "text": "PostgreSQL", "targetCategory": "Data Persistence" },
+          { "text": "Vue.js Engine", "targetCategory": "UI / Client Layer" },
+          { "text": "Redis Cache", "targetCategory": "Data Persistence" }
+        ]
+      },
+      {
+        "nodeId": "poker_demo_002",
+        "title": "Flop C-Bet Strategy Validation",
+        "phase": "FLOP",
+        "pot": "6.50 BB",
+        "communityCards": ["As", "9h", "2c"],
+        "quizType": "poker_drag",
+        "displayText": "You raised Preflop from the Button and the Big Blind called. The Big Blind checks to you on an Ace-High dry texture.",
+        "players": [
+          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "BTN", "isActive": true, "isTurn": true, "stackSize": "96.50 BB", "currentBet": "0.00 BB", "holeCards": ["Kh", "Qh"], "isHero": true},
+          {"position": "SB", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "BB", "isActive": true, "isTurn": false, "stackSize": "96.50 BB", "currentBet": "0.00 BB"}
+        ],
+        "choices": [
+          {"hand": "KhQh", "targetCategory": "Bet (Bluff)"}
+        ]
+      }
+    ];
+
+    // --- APPLICATION CORE RUNTIME ARCHITECTURE ---
+    let deck = [];
+    let sessionQueue = [];
+    let currentCard = null;
+    let stats = JSON.parse(localStorage.getItem('flashcard_engine_stats')) || {};
+    let isCompactMode = true; // Global layout toggle configuration state
+
+    let sessionTotal = 0;
+    let sessionCompleted = 0;
+    let draggedElement = null;
+
     async function init() {
       try {
         const response = await fetch('data.json');
-        if (!response.ok) throw new Error('data.json not found');
+        if (!response.ok) throw new Error('Network configuration lookup error.');
         deck = await response.json();
       } catch (error) {
-        console.warn('Could not load data.json, using fallback data.');
+        console.warn('Could not cleanly load an external data.json resource. Falling back onto the embedded runtime repository.');
         deck = fallbackDeck;
       }
-
-      // Filter out cards mastered ("Well" - state 2) today for spaced repetition
-      // For this demo, we just load everything not marked '2'
+      
+      // Filter algorithm out cards currently locked down as mastered status (Value: 2)
       sessionQueue = deck.filter(card => !stats[card.nodeId] || stats[card.nodeId] < 2);
-
+      
       if (sessionQueue.length === 0) {
-        // Reset if all done
+        // Recycle state parameters to ensure endless loops during evaluation
         sessionQueue = [...deck];
         stats = {};
-        localStorage.removeItem('flashcard_stats');
+        localStorage.removeItem('flashcard_engine_stats');
       }
 
       sessionTotal = sessionQueue.length;
@@ -351,23 +355,20 @@
       nextCard();
     }
 
-    // --- CORE LOGIC ---
     function updateProgress() {
-      document.getElementById('progress-text').innerText = `${sessionCompleted} / ${sessionTotal} Cards`;
+      document.getElementById('progress-text').innerText = `${sessionCompleted} / ${sessionTotal} Decks Evaluation`;
       const pct = sessionTotal === 0 ? 0 : (sessionCompleted / sessionTotal) * 100;
       document.getElementById('progress-bar').style.width = `${pct}%`;
     }
 
-    function saveProgress(nodeId, score) {
-      // score: 0 (Badly), 1 (OK), 2 (Well)
-      stats[nodeId] = score;
-      localStorage.setItem('flashcard_stats', JSON.stringify(stats));
+    function saveProgress(nodeId, masteryValue) {
+      stats[nodeId] = masteryValue;
+      localStorage.setItem('flashcard_engine_stats', JSON.stringify(stats));
     }
 
-    function handleCardComplete(score) {
-      saveProgress(currentCard.nodeId, score);
-      if (score === 0) {
-        // Re-queue at the end
+    function handleCardComplete(masteryValue) {
+      saveProgress(currentCard.nodeId, masteryValue);
+      if (masteryValue === 0) {
         sessionQueue.push(currentCard);
         sessionTotal++;
       }
@@ -379,81 +380,99 @@
     function nextCard() {
       const container = document.getElementById('card-container');
       container.classList.remove('fade-enter');
-      void container.offsetWidth; // Trigger reflow
+      void container.offsetWidth; // Force hardware composition layout paint reflow
       container.classList.add('fade-enter');
 
       if (sessionQueue.length === 0) {
-        container.innerHTML = `<div class="text-center mt-10"><h2 class="text-3xl text-green-400 font-bold mb-4">Session Complete!</h2><p class="text-slate-400">You've finished all cards for now.</p></div>`;
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center text-center py-12 flex-grow">
+            <div class="bg-green-900/40 p-4 rounded-full border border-green-600/30 mb-4 animate-bounce">🎯</div>
+            <h2 class="text-2xl font-bold text-green-400 mb-2">Deck Pipeline Evaluated!</h2>
+            <p class="text-slate-400 text-sm max-w-sm">Spaced repetition interval registers all cards in active loops as synchronized.</p>
+            <button onclick="localStorage.removeItem('flashcard_engine_stats'); location.reload();" class="mt-6 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-xs font-semibold tracking-wide transition-colors">Reset Local Cache & Re-run</button>
+          </div>
+        `;
         return;
       }
 
       currentCard = sessionQueue.shift();
-      renderCard(currentCard, container);
+      renderCardRouter(currentCard, container);
     }
 
-    // --- RENDERING ROUTER ---
-    function renderCard(card, container) {
+    function renderCardRouter(card, container) {
       container.innerHTML = '';
       switch (card.quizType) {
-        case 'anki': return renderAnki(card, container);
-        case 'multiple_choice': return renderMultipleChoice(card, container);
-        case 'drag_drop': return renderDragDrop(card, container);
-        case 'poker_drag': return renderPokerDrag(card, container);
-        default: container.innerHTML = `<p class="text-red-400">Unknown quiz type: ${card.quizType}</p>`;
+        case 'anki': return renderAnkiMode(card, container);
+        case 'multiple_choice': return renderMultipleChoiceMode(card, container);
+        case 'drag_drop': return renderStandardDragDropMode(card, container);
+        case 'poker_drag': return renderAdvancedPokerMode(card, container);
+        default: container.innerHTML = `<p class="text-red-400 p-4">Unknown card architecture exception context: ${card.quizType}</p>`;
       }
     }
 
-    // --- 1. ANKI RATING SYSTEM ---
-    function renderAnki(card, container) {
+    // --- 1. MODE: STANDARD ANKI RATING FLASHCARD ---
+    function renderAnkiMode(card, container) {
       container.innerHTML = `
-        <div class="flex-grow flex flex-col justify-center items-center text-center">
-          <h2 class="text-2xl font-medium text-white mb-8">${card.question}</h2>
-          <div id="answer-area" class="hidden flex-col items-center w-full">
-            <hr class="w-full border-slate-600 mb-8">
-            <p class="text-xl text-slate-300 mb-8">${card.answer}</p>
-            <div class="flex gap-4 w-full justify-center">
-              <button onclick="handleCardComplete(0)" class="px-6 py-3 bg-red-900/50 hover:bg-red-800 text-red-200 rounded-lg transition-colors border border-red-700/50">Badly</button>
-              <button onclick="handleCardComplete(1)" class="px-6 py-3 bg-yellow-900/50 hover:bg-yellow-800 text-yellow-200 rounded-lg transition-colors border border-yellow-700/50">OK</button>
-              <button onclick="handleCardComplete(2)" class="px-6 py-3 bg-green-900/50 hover:bg-green-800 text-green-200 rounded-lg transition-colors border border-green-700/50">Well</button>
+        <div class="flex-grow flex flex-col justify-between h-full">
+          <div>
+            <span class="text-[10px] uppercase tracking-widest font-mono bg-blue-900/60 border border-blue-700/40 text-blue-300 px-2 py-0.5 rounded">Standard Flashcard</span>
+            <h2 class="text-lg font-medium text-white mt-4 leading-relaxed">${card.question}</h2>
+          </div>
+          
+          <div id="answer-area" class="hidden flex-col w-full mt-6 bg-slate-900/40 border border-slate-700/50 rounded-xl p-4">
+            <p class="text-sm text-slate-300 leading-relaxed">${card.answer}</p>
+            <div class="grid grid-cols-3 gap-3 mt-6">
+              <button onclick="handleCardComplete(0)" class="px-3 py-2 bg-red-950/40 hover:bg-red-900 text-red-200 text-xs font-semibold rounded-lg transition-all border border-red-800/40">Badly (Re-queue)</button>
+              <button onclick="handleCardComplete(1)" class="px-3 py-2 bg-yellow-950/40 hover:bg-yellow-900 text-yellow-200 text-xs font-semibold rounded-lg transition-all border border-yellow-800/40">OK (Keep Loop)</button>
+              <button onclick="handleCardComplete(2)" class="px-3 py-2 bg-green-950/40 hover:bg-green-900 text-green-200 text-xs font-semibold rounded-lg transition-all border border-green-800/40">Well (Mastered)</button>
             </div>
           </div>
-          <button id="show-btn" class="mt-auto w-full max-w-sm py-4 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold transition-colors">Show Answer</button>
+          
+          <button id="show-btn" class="mt-8 w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold tracking-wide transition-colors shadow-lg shadow-blue-900/30">Show Answer Formulation</button>
         </div>
       `;
       document.getElementById('show-btn').addEventListener('click', (e) => {
         e.target.classList.add('hidden');
-        document.getElementById('answer-area').classList.remove('hidden');
-        document.getElementById('answer-area').classList.add('flex');
+        const ans = document.getElementById('answer-area');
+        ans.classList.remove('hidden');
+        ans.classList.add('flex');
       });
     }
 
-    // --- 2. MULTIPLE CHOICE ---
-    function renderMultipleChoice(card, container) {
-      const optionsHtml = card.options.map((opt, i) =>
-        `<button data-idx="${i}" class="mc-btn w-full text-left p-4 bg-slate-700 hover:bg-slate-600 rounded-lg border border-slate-600 transition-colors">${opt}</button>`
+    // --- 2. MODE: MULTIPLE CHOICE OPTION PARSER ---
+    function renderMultipleChoiceMode(card, container) {
+      const optionsHtml = card.options.map((opt, i) => 
+        `<button data-idx="${i}" class="mc-btn w-full text-left p-3.5 bg-slate-700/60 hover:bg-slate-700 rounded-xl border border-slate-600/50 text-xs transition-all flex items-start gap-3"><span class="bg-slate-800 border border-slate-600 text-slate-400 font-mono text-[10px] px-1.5 py-0.5 rounded">${String.fromCharCode(65+i)}</span> <span class="text-slate-200">${opt}</span></button>`
       ).join('');
 
       container.innerHTML = `
-        <h2 class="text-2xl font-medium text-white mb-8">${card.question}</h2>
-        <div class="flex flex-col gap-3" id="mc-options">${optionsHtml}</div>
-        <button id="mc-next" class="hidden mt-8 w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold transition-colors">Next Card</button>
+        <div class="flex-grow flex flex-col justify-between h-full">
+          <div>
+            <span class="text-[10px] uppercase tracking-widest font-mono bg-indigo-900/60 border border-indigo-700/40 text-indigo-300 px-2 py-0.5 rounded">Multiple Choice</span>
+            <h2 class="text-lg font-medium text-white mt-4 mb-6 leading-relaxed">${card.question}</h2>
+            <div class="flex flex-col gap-2.5" id="mc-options">${optionsHtml}</div>
+          </div>
+          <button id="mc-next" class="hidden mt-6 w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition-all">Advance Deck Loop</button>
+        </div>
       `;
 
       const btns = container.querySelectorAll('.mc-btn');
       btns.forEach(btn => {
         btn.addEventListener('click', (e) => {
-          if (container.querySelector('.pointer-events-none')) return; // already answered
-          btns.forEach(b => b.classList.add('pointer-events-none', 'opacity-50'));
-
-          const isCorrect = parseInt(e.target.dataset.idx) === card.correctIndex;
-          e.target.classList.remove('bg-slate-700', 'hover:bg-slate-600', 'opacity-50');
-
+          const currentTarget = e.currentTarget;
+          if (container.querySelector('.pointer-events-none')) return; // Thread locks double interaction
+          
+          btns.forEach(b => b.classList.add('pointer-events-none', 'opacity-40'));
+          const selectedIdx = parseInt(currentTarget.dataset.idx);
+          const isCorrect = selectedIdx === card.correctIndex;
+          
+          currentTarget.classList.remove('bg-slate-700/60', 'hover:bg-slate-700', 'opacity-40');
           if (isCorrect) {
-            e.target.classList.add('bg-green-600', 'border-green-500', 'text-white');
+            currentTarget.classList.add('bg-green-900/50', 'border-green-500', 'ring-1', 'ring-green-400');
           } else {
-            e.target.classList.add('bg-red-600', 'border-red-500', 'text-white');
-            btns[card.correctIndex].classList.remove('opacity-50', 'bg-slate-700');
-            btns[card.correctIndex].classList.add('bg-green-600/50', 'border-green-500');
+            currentTarget.classList.add('bg-red-900/50', 'border-red-500', 'ring-1', 'ring-red-400');
+            btns[card.correctIndex].classList.remove('opacity-40');
+            btns[card.correctIndex].classList.add('bg-green-900/30', 'border-green-600/80');
           }
 
           const nextBtn = document.getElementById('mc-next');
@@ -463,73 +482,47 @@
       });
     }
 
-    // --- 3. STANDARD DRAG & DROP ---
-    function renderDragDrop(card, container) {
+    // --- 3. MODE: STANDARD CATEGORICAL DRAG & DROP ---
+    function renderStandardDragDropMode(card, container) {
       const categories = [...new Set(card.choices.map(c => c.targetCategory))];
-      let draggablesHtml = card.choices.map((c, i) =>
-        `<div draggable="true" data-target="${c.targetCategory}" class="cursor-grab active:cursor-grabbing p-3 bg-slate-600 rounded shadow border border-slate-500 text-center" ondragstart="dragStart(event)">${c.text || c.hand}</div>`
+      
+      let draggablesHtml = card.choices.map((c, i) => 
+        `<div draggable="true" data-target="${c.targetCategory}" id="dd-item-${i}" class="cursor-grab active:cursor-grabbing px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-100 font-medium text-xs rounded-lg shadow-md border border-slate-600 text-center transition-transform transform active:scale-95" ondragstart="dragStart(event)">${c.text}</div>`
       ).join('');
 
       let dropzonesHtml = categories.map(cat => `
-        <div class="flex-1 flex flex-col">
-          <h3 class="text-center font-bold text-slate-400 mb-2">${cat}</h3>
-          <div data-cat="${cat}" class="dropzone flex-1 bg-slate-800/50 border-2 border-dashed border-slate-600 rounded-xl p-4 flex flex-col gap-2 min-h-[150px]" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
+        <div class="flex-1 flex flex-col bg-slate-900/30 border border-slate-700/60 p-3 rounded-xl min-w-[200px]">
+          <h3 class="text-center text-xs font-bold text-slate-400 tracking-wider uppercase mb-2 border-b border-slate-700 pb-1.5">${cat}</h3>
+          <div data-cat="${cat}" class="dropzone flex-1 bg-slate-800/40 border-2 border-dashed border-slate-700/70 rounded-lg p-2.5 flex flex-col gap-2 min-h-[140px] transition-all" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
         </div>
       `).join('');
 
       container.innerHTML = `
-        <h2 class="text-xl font-medium text-white mb-6">${card.question || card.displayText}</h2>
-        <div id="source-zone" class="flex flex-wrap gap-3 mb-8 p-4 bg-slate-700/30 rounded-xl min-h-[80px]" ondragover="dragOver(event)" ondrop="dropSource(event)">
-          ${draggablesHtml}
+        <div class="flex flex-col justify-between h-full flex-grow">
+          <div>
+            <span class="text-[10px] uppercase tracking-widest font-mono bg-purple-900/60 border border-purple-700/40 text-purple-300 px-2 py-0.5 rounded">Categorized Sorting</span>
+            <h2 class="text-base font-medium text-slate-200 mt-3 mb-4 leading-relaxed">${card.question}</h2>
+            
+            <div id="source-zone" class="flex flex-wrap gap-2.5 mb-6 p-3 bg-slate-900/50 border border-slate-700/60 rounded-xl min-h-[65px] items-center" ondragover="dragOver(event)" ondrop="dropSource(event)">
+              ${draggablesHtml}
+            </div>
+            
+            <div class="flex flex-wrap gap-4 w-full">${dropzonesHtml}</div>
+          </div>
+          <button id="dd-next" class="hidden mt-6 w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition-all">Submit Classifications</button>
         </div>
-        <div class="flex gap-4 w-full">${dropzonesHtml}</div>
-        <button id="dd-next" class="hidden mt-8 w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold transition-colors">Complete</button>
       `;
 
-      // Attach validation logic globally to card
       container.dataset.totalItems = card.choices.length;
-      container.dataset.correctItems = 0;
     }
 
-    // --- 4. POKER STRATEGY MATRIX ---
-    function parseCardHtml(cardStr) {
-      if (cardStr === '??' || !cardStr) return `<div class="card card-back"></div>`;
-      const suitLetter = cardStr.slice(-1).toLowerCase();
-      const value = cardStr.substring(0, cardStr.length - 1);
-      const suitData = SUIT_MAP[suitLetter] || { className: '', symbol: '' };
-      return `<div class="card ${suitData.className}">${value}<br>${suitData.symbol}</div>`;
-    }
-
-    function generateChipStackHtml(betString) {
-      const numVal = parseFloat(betString);
-      if (isNaN(numVal) || numVal <= 0) return '';
-
-      let chipColor = '#dcdde1';
-      if (numVal >= 1 && numVal < 2.5) chipColor = '#e74c3c';
-      if (numVal >= 2.5 && numVal < 10) chipColor = '#2980b9';
-      if (numVal >= 10) chipColor = '#2c3e50';
-
-      let dynamicStackCount = 1;
-      if (numVal > 1.5) dynamicStackCount = 2;
-      if (numVal >= 2.5) dynamicStackCount = 3;
-      if (numVal >= 8) dynamicStackCount = 4;
-      if (numVal >= 11) dynamicStackCount = 5;
-
-      let htmlString = '<div class="chip-stack">';
-      for (let i = 0; i < dynamicStackCount; i++) {
-        htmlString += `<div class="poker-chip" style="background: ${chipColor}; bottom: ${i * 3}px; z-index: ${i};"></div>`;
-      }
-      return htmlString + '</div>';
-    }
-
-    function renderPokerDrag(card, container) {
-      // 1. Build Table State
+    // --- 4. MODE: ADVANCED POKER STRATEGY MATRIX (WITH EMBEDDED DYNAMIC TOGGLE) ---
+    function renderAdvancedPokerMode(card, container) {
       let playersHtml = '';
       let betsHtml = '';
 
       card.players.forEach(player => {
         let holeCardsHtml = '';
-        // Generate hole cards if player is active and has them, otherwise show backs if they are active
         if (player.isActive) {
           if (player.holeCards && player.holeCards.length > 0) {
             holeCardsHtml = player.holeCards.map(parseCardHtml).join('');
@@ -541,126 +534,145 @@
         const isTurnClass = player.isTurn ? 'active-turn' : '';
         const isActiveClass = player.isActive ? '' : 'inactive';
         const dealerButtonHtml = player.position === 'BTN' ? '<div class="dealer-button">D</div>' : '';
-        const heroLabel = player.isHero ? '<span class="text-blue-300 ml-1">(Hero)</span>' : '';
+        const heroLabel = player.isHero ? '<span class="text-blue-400 font-bold ml-0.5">(H)</span>' : '';
 
         playersHtml += `
-      <div class="player-seat seat-${player.position} ${isTurnClass} ${isActiveClass}">
-        ${dealerButtonHtml}
-        <div class="font-bold text-slate-200">${player.position} ${heroLabel}</div>
-        <div class="text-slate-400">${player.stackSize}</div>
-        <div class="hole-cards">${holeCardsHtml}</div>
-      </div>
-    `;
+          <div class="player-seat seat-${player.position} ${isTurnClass} ${isActiveClass}">
+            ${dealerButtonHtml}
+            <div class="font-bold text-slate-300">${player.position}${heroLabel}</div>
+            <div class="text-[10px] text-slate-400 tracking-tighter">${player.stackSize}</div>
+            <div class="hole-cards">${holeCardsHtml}</div>
+          </div>
+        `;
 
         if (parseFloat(player.currentBet) > 0) {
           betsHtml += `
-        <div class="bet-indicator bet-${player.position}">
-          ${generateChipStackHtml(player.currentBet)}
-          <span>${player.currentBet}</span>
-        </div>
-      `;
+            <div class="bet-indicator bet-${player.position}">
+              ${generateChipStackHtml(player.currentBet)}
+              <span>${player.currentBet}</span>
+            </div>
+          `;
         }
       });
 
       let communityCardsHtml = '';
       if (!card.communityCards || card.communityCards.length === 0) {
-        communityCardsHtml = `<span style="color:rgba(255,255,255,0.3); font-size:1.5rem; font-weight:bold; letter-spacing: 2px;">PREFLOP</span>`;
+        communityCardsHtml = `<span class="text-slate-500/50 font-mono text-[11px] font-bold tracking-widest border border-slate-700/40 px-3 py-1 bg-slate-900/30 rounded-md">PREFLOP RUNTIME</span>`;
       } else {
         communityCardsHtml = card.communityCards.map(parseCardHtml).join('');
       }
 
-      // 2. Build Categories & Draggables
       const categories = [...new Set(card.choices.map(c => c.targetCategory))];
-      let draggablesHtml = card.choices.map(c =>
-        `<div draggable="true" data-target="${c.targetCategory}" class="cursor-grab active:cursor-grabbing p-3 bg-slate-700 rounded-lg shadow-lg border border-slate-500 text-center font-mono font-bold" ondragstart="dragStart(event)">${c.hand}</div>`
+      let draggablesHtml = card.choices.map((c, i) => 
+        `<div draggable="true" data-target="${c.targetCategory}" id="poker-item-${i}" class="cursor-grab active:cursor-grabbing px-3 py-2 bg-slate-700 text-white font-mono font-bold text-xs rounded-lg shadow-xl border border-slate-500 text-center select-none" ondragstart="dragStart(event)">${c.hand}</div>`
       ).join('');
 
       let dropzonesHtml = categories.map(cat => `
-    <div class="flex-1 flex flex-col">
-      <h3 class="text-center text-sm font-bold text-slate-400 mb-2">${cat}</h3>
-      <div data-cat="${cat}" class="dropzone flex-1 bg-slate-900/50 border-2 border-dashed border-slate-600 rounded-xl p-3 flex flex-col gap-2 min-h-[100px]" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
-    </div>
-  `).join('');
+        <div class="flex-1 flex flex-col bg-slate-900/20 border border-slate-700/50 p-2.5 rounded-xl">
+          <h3 class="text-center text-[11px] font-bold text-slate-400 tracking-wide uppercase mb-1.5">${cat}</h3>
+          <div data-cat="${cat}" class="dropzone flex-1 bg-slate-900/40 border border-dashed border-slate-700/80 rounded-lg p-2 flex flex-col gap-1.5 min-h-[75px]" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
+        </div>
+      `).join('');
 
-      // 3. Inject DOM structure
       container.innerHTML = `
-    <div class="flex justify-between items-start mb-4">
-      <h2 class="text-xl font-bold text-white">${card.title}</h2>
-      <div class="text-right bg-slate-900 px-4 py-2 rounded-lg border border-slate-700 shadow-inner">
-        <span class="text-sm text-slate-400">Pot:</span> 
-        <span class="font-bold text-yellow-400 ml-2">${card.pot}</span>
-      </div>
-    </div>
-    <p class="text-slate-300 mb-4">${card.displayText}</p>
-    
-    <div class="poker-table-area">
-      <div class="community-cards">
-        ${communityCardsHtml}
-      </div>
-      ${playersHtml}
-      ${betsHtml}
-    </div>
+        <div class="flex flex-col justify-between h-full flex-grow">
+          <div>
+            <div class="flex justify-between items-start border-b border-slate-700/50 pb-2 mb-3">
+              <div>
+                <span class="text-[10px] uppercase tracking-widest font-mono bg-emerald-900/60 border border-emerald-700/40 text-emerald-300 px-2 py-0.5 rounded">Poker Matrix Engine</span>
+                <h2 class="text-sm font-bold text-white mt-1.5">${card.title || 'Game Matrix Checkpoint'}</h2>
+              </div>
+              
+              <div class="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1.5 border border-slate-700/80 rounded-lg shadow-inner text-[11px]">
+                <input type="checkbox" id="compact-toggle" ${isCompactMode ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-blue-600 focus:ring-blue-500 bg-slate-800 border-slate-600 cursor-pointer">
+                <label for="compact-toggle" class="text-slate-300 font-medium cursor-pointer select-none">Compact Engine Table</label>
+              </div>
+            </div>
+            
+            <p class="text-xs text-slate-300 mb-3 leading-relaxed bg-slate-900/30 p-2.5 border border-slate-700/30 rounded-lg">${card.displayText}</p>
+            
+            <div class="poker-table-area ${isCompactMode ? 'compact' : ''}">
+              <div class="absolute top-2.5 right-4 bg-slate-950/80 text-[10px] border border-slate-800/80 font-bold text-yellow-400 px-2 py-0.5 rounded shadow-md z-10">Pot: ${card.pot}</div>
+              <div class="community-cards">${communityCardsHtml}</div>
+              ${playersHtml}
+              ${betsHtml}
+            </div>
 
-    <div id="source-zone" class="flex justify-center gap-3 mb-6 min-h-[60px]" ondragover="dragOver(event)" ondrop="dropSource(event)">
-      ${draggablesHtml}
-    </div>
+            <div id="source-zone" class="flex justify-center gap-2.5 my-4 min-h-[50px] items-center bg-slate-900/40 p-2 rounded-xl border border-slate-700/40" ondragover="dragOver(event)" ondrop="dropSource(event)">
+              ${draggablesHtml}
+            </div>
 
-    <div class="flex gap-4 w-full">${dropzonesHtml}</div>
-    <button id="dd-next" class="hidden mt-8 w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold transition-colors">Next Hand</button>
-  `;
+            <div class="flex gap-3 w-full">${dropzonesHtml}</div>
+          </div>
+          
+          <button id="dd-next" class="hidden mt-5 w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold shadow-lg transition-colors">Confirm Strategic Configuration</button>
+        </div>
+      `;
+
+      // Assign programmatic listeners explicitly to runtime view controls
+      document.getElementById('compact-toggle').addEventListener('change', (e) => {
+        isCompactMode = e.target.checked;
+        const tableObj = container.querySelector('.poker-table-area');
+        if (tableObj) {
+          if (isCompactMode) tableObj.classList.add('compact');
+          else tableObj.classList.remove('compact');
+        }
+      });
 
       container.dataset.totalItems = card.choices.length;
-      container.dataset.correctItems = 0;
     }
-    // --- DRAG AND DROP HANDLERS ---
-    let draggedElement = null;
 
+    // --- SHARED DRAG AND DROP RUNTIME INTERACTION HANDLERS ---
     function dragStart(e) {
       draggedElement = e.target;
       e.dataTransfer.effectAllowed = 'move';
-      // Required for Firefox
-      e.dataTransfer.setData('text/plain', e.target.innerText);
-      setTimeout(() => e.target.classList.add('opacity-50'), 0);
+      e.dataTransfer.setData('text/plain', e.target.id);
+      setTimeout(() => e.target.classList.add('opacity-40'), 0);
     }
 
     function dragOver(e) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
-      if (e.currentTarget.classList.contains('dropzone')) {
-        e.currentTarget.classList.add('drag-active');
+      const zone = e.currentTarget;
+      if (zone.classList.contains('dropzone')) {
+        zone.classList.add('drag-active');
       }
     }
 
     function dragLeave(e) {
-      if (e.currentTarget.classList.contains('dropzone')) {
-        e.currentTarget.classList.remove('drag-active');
+      const zone = e.currentTarget;
+      if (zone.classList.contains('dropzone')) {
+        zone.classList.remove('drag-active');
       }
     }
 
     function dropSource(e) {
       e.preventDefault();
-      draggedElement.classList.remove('opacity-50');
-      // If dragging back to source, reset styles
-      draggedElement.classList.remove('bg-green-600', 'border-green-500', 'bg-red-600', 'border-red-500');
-      draggedElement.classList.add('bg-slate-600', 'border-slate-500');
+      if (!draggedElement) return;
+      draggedElement.classList.remove('opacity-40');
+      
+      // Strip score validation wrappers completely
+      draggedElement.classList.remove('bg-green-600', 'border-green-500', 'bg-red-600', 'border-red-500', 'bg-emerald-600', 'border-emerald-500');
+      draggedElement.classList.add('bg-slate-700', 'border-slate-500');
+      
       document.getElementById('source-zone').appendChild(draggedElement);
-      checkDragCompletion();
+      checkDragAndDropCompletionState();
     }
 
     function dropToMatch(e) {
       e.preventDefault();
-      const dropzone = e.currentTarget;
-      dropzone.classList.remove('drag-active');
-      draggedElement.classList.remove('opacity-50');
+      const zone = e.currentTarget;
+      zone.classList.remove('drag-active');
+      if (!draggedElement) return;
+      draggedElement.classList.remove('opacity-40');
 
-      const targetCategory = draggedElement.getAttribute('data-target');
-      const dropCategory = dropzone.getAttribute('data-cat');
+      const expectedCategory = draggedElement.getAttribute('data-target');
+      const dropContainerCategory = zone.getAttribute('data-cat');
 
-      dropzone.appendChild(draggedElement);
+      zone.appendChild(draggedElement);
+      draggedElement.classList.remove('bg-slate-700', 'border-slate-500', 'bg-slate-600');
 
-      // Validation UI feedback
-      draggedElement.classList.remove('bg-slate-600', 'border-slate-500', 'bg-slate-700');
-      if (targetCategory === dropCategory) {
+      if (expectedCategory === dropContainerCategory) {
         draggedElement.classList.add('bg-green-600', 'border-green-500');
         draggedElement.dataset.correct = "true";
       } else {
@@ -668,33 +680,29 @@
         draggedElement.dataset.correct = "false";
       }
 
-      checkDragCompletion();
+      checkDragAndDropCompletionState();
     }
 
-    function checkDragCompletion() {
+    function checkDragAndDropCompletionState() {
       const container = document.getElementById('card-container');
-      const total = parseInt(container.dataset.totalItems);
+      const expectedTotal = parseInt(container.dataset.totalItems);
+      
+      const elementsInScope = Array.from(container.querySelectorAll('[draggable="true"]'));
+      const localizedDropzonesCount = elementsInScope.filter(el => el.parentElement.classList.contains('dropzone')).length;
+      const perfectScoreValidated = elementsInScope.every(el => el.dataset.correct === "true" && el.parentElement.classList.contains('dropzone'));
 
-      // Count items that are in dropzones and are correct
-      const allDraggables = Array.from(container.querySelectorAll('[draggable="true"]'));
-      const inDropzones = allDraggables.filter(el => el.parentElement.classList.contains('dropzone'));
-      const allCorrect = allDraggables.every(el => el.dataset.correct === "true" && el.parentElement.classList.contains('dropzone'));
-
-      const nextBtn = document.getElementById('dd-next');
-
-      if (inDropzones.length === total) {
-        nextBtn.classList.remove('hidden');
-        // If all are perfectly correct on first try, mark well. Otherwise OK or Badly depending on logic.
-        // For simplicity: all correct = Well(2), if they had to drag around = OK(1)
-        nextBtn.onclick = () => handleCardComplete(allCorrect ? 2 : 1);
+      const nextActionBtn = document.getElementById('dd-next');
+      
+      if (localizedDropzonesCount === expectedTotal) {
+        nextActionBtn.classList.remove('hidden');
+        nextActionBtn.onclick = () => handleCardComplete(perfectScoreValidated ? 2 : 1);
       } else {
-        nextBtn.classList.add('hidden');
+        nextActionBtn.classList.add('hidden');
       }
     }
 
-    // Start App
+    // Synchronize event handlers to boot loop execution parameters
     document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
-
 </html>
