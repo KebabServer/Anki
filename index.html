@@ -179,7 +179,6 @@
     let deck = [];
     let sessionQueue = [];
     let currentCard = null;
-    let isCompactMode = true;
 
     let sessionTotal = 0;
     let sessionCompleted = 0;
@@ -521,13 +520,9 @@
                 <span class="badge-engine">Poker Matrix Engine</span>
                 <h2 class="header-title">${escapeHtml(card.title || 'Game Matrix Checkpoint')}</h2>
               </div>
-              <div class="toggle-container">
-                <input type="checkbox" id="compact-toggle" ${isCompactMode ? 'checked' : ''} class="toggle-input">
-                <label for="compact-toggle" class="toggle-label">Compact Engine Table</label>
-              </div>
             </div>
             <p class="display-text">${escapeHtml(card.displayText)}</p>
-            <div class="poker-table-area ${isCompactMode ? 'compact' : ''}">
+            <div class="poker-table-area">
               <div class="center-board">
                 <div class="community-cards">${communityCardsHtml}</div>
                 <div class="pot-display">
@@ -544,12 +539,6 @@
           <button id="dd-next" class="btn-confirm hidden">Confirm Strategic Configuration</button>
         </div>
       `;
-
-      document.getElementById('compact-toggle').addEventListener('change', (e) => {
-        isCompactMode = e.target.checked;
-        const tableObj = container.querySelector('.poker-table-area');
-        if (tableObj) tableObj.classList.toggle('compact', isCompactMode);
-      });
 
       container.dataset.totalItems = card.choices.length;
     }
