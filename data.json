@@ -15,7 +15,7 @@
         "nodeId": "Facing_4Bet_OOP_001",
         "title": "Facing 4Bet OOP",
         "pot": "50.00 BB",
-        "communityCards": [],
+        "communityCards": ["9c7cTd"],
         "quizType": "poker_drag",
         "displayText": "The Button opens to 2.50 BB. Small Blind folds. Action shifts entirely to you in the Big Blind with effective stack metrics.",
         "players": [
