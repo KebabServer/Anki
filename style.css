@@ -1,4 +1,3 @@
-<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     body { font-family: 'Inter', sans-serif; }
     
@@ -24,7 +23,7 @@
     }
 
     /* Common Card Styles */
-    .community-cards { display: flex; gap: 6px; z-index: 10; transition: all 0.3s; }
+    .community-cards { display: flex; gap: 4px; z-index: 10; transition: all 0.3s; }
     .card {
       background: white;
       border-radius: 4px;
@@ -80,8 +79,8 @@
       align-items: center;
       font-weight: 700;
       color: #f1f5f9;
-      z-index: 15;
-      background: rgba(15, 23, 42, 0.75);
+      z-index: 30; /* Heightened layer to sit elegantly atop seats and cards */
+      background: rgba(15, 23, 42, 0.85);
       border-radius: 6px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -95,121 +94,81 @@
       box-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
 
-    /* --- VIEW MODE 1: STANDARD/LARGE RULES --- */
-    .poker-table-area:not(.compact) {
-      height: 340px;
-      border: 14px solid #1e293b;
-      border-radius: 170px;
-    }
-    .poker-table-area:not(.compact) .card {
-      width: 38px; height: 54px; font-size: 14px; border: 1px solid #cbd5e1;
-    }
-    .poker-table-area:not(.compact) .player-seat {
-      padding: 6px 12px; border-radius: 10px; font-size: 12px; min-width: 90px;
-    }
-    .poker-table-area:not(.compact) .player-seat .hole-cards { gap: 4px; margin-top: 6px; }
-    .poker-table-area:not(.compact) .dealer-button {
-      top: -10px; left: -10px; width: 22px; height: 22px; font-size: 11px;
-    }
-    .poker-table-area:not(.compact) .bet-indicator {
-      flex-direction: column; font-size: 11px; padding: 3px 6px; gap: 2px;
-    }
-    .poker-table-area:not(.compact) .chip-stack { width: 22px; height: 12px; }
-    .poker-table-area:not(.compact) .poker-chip { width: 22px; height: 6px; }
-
-    /* Large Seating Placements */
-    .poker-table-area:not(.compact) .seat-UTG { top: 40%; left: -35px; transform: translateY(-50%); }
-    .poker-table-area:not(.compact) .seat-HJ  { top: -25px; left: 22%; }
-    .poker-table-area:not(.compact) .seat-CO  { top: -25px; right: 22%; }
-    .poker-table-area:not(.compact) .seat-BTN { top: 40%; right: -35px; transform: translateY(-50%); }
-    .poker-table-area:not(.compact) .seat-SB  { bottom: -25px; right: 22%; }
-    .poker-table-area:not(.compact) .seat-BB  { bottom: -25px; left: 22%; }
-
-    /* Large Bet Positions */
-    .poker-table-area:not(.compact) .bet-UTG  { top: 40%; left: 85px; transform: translateY(-50%); }
-    .poker-table-area:not(.compact) .bet-HJ   { top: 65px; left: 26%; }
-    .poker-table-area:not(.compact) .bet-CO   { top: 65px; right: 26%; }
-    .poker-table-area:not(.compact) .bet-BTN  { top: 40%; right: 85px; transform: translateY(-50%); }
-    .poker-table-area:not(.compact) .bet-SB   { bottom: 65px; right: 26%; }
-    .poker-table-area:not(.compact) .bet-BB   { bottom: 65px; left: 26%; }
-
-
-    /* --- VIEW MODE 2: COMPACT RULES --- */
-    .poker-table-area.compact {
+    /* --- LOCKED COMPACT ENGINE RULES --- */
+    .poker-table-area {
       height: 190px;
       border: 8px solid #1e293b;
       border-radius: 95px;
     }
-    .poker-table-area.compact .card {
+    .poker-table-area .card {
       width: 26px; height: 36px; font-size: 11px; border: 0.5px solid #e2e8f0;
     }
-    .poker-table-area.compact .player-seat {
+    .poker-table-area .player-seat {
       padding: 2px 6px; border-radius: 6px; font-size: 9px; min-width: 65px; border-width: 1px;
     }
-    .poker-table-area.compact .player-seat .hole-cards { gap: 2px; margin-top: 2px; }
-    .poker-table-area.compact .dealer-button {
+    .poker-table-area .player-seat .hole-cards { gap: 2px; margin-top: 2px; }
+    .poker-table-area .dealer-button {
       top: -6px; left: -6px; width: 16px; height: 16px; font-size: 9px;
     }
-    .poker-table-area.compact .bet-indicator {
+    .poker-table-area .bet-indicator {
       flex-direction: row; font-size: 9px; padding: 1px 4px; gap: 4px;
     }
-    .poker-table-area.compact .chip-stack { width: 14px; height: 6px; }
-    .poker-table-area.compact .poker-chip { width: 14px; height: 3px; }
+    .poker-table-area .chip-stack { width: 14px; height: 6px; }
+    .poker-table-area .poker-chip { width: 14px; height: 3px; }
 
     /* Compact Seating Placements */
-    .poker-table-area.compact .seat-UTG { top: 40%; left: 8px; transform: translateY(-50%); }
-    .poker-table-area.compact .seat-HJ  { top: 6px; left: 26%; }
-    .poker-table-area.compact .seat-CO  { top: 6px; right: 26%; }
-    .poker-table-area.compact .seat-BTN { top: 40%; right: 8px; transform: translateY(-50%); }
-    .poker-table-area.compact .seat-SB  { bottom: 6px; right: 26%; }
-    .poker-table-area.compact .seat-BB  { bottom: 6px; left: 26%; }
+    .poker-table-area .seat-UTG { top: 40%; left: 8px; transform: translateY(-50%); }
+    .poker-table-area .seat-HJ  { top: 6px; left: 26%; }
+    .poker-table-area .seat-CO  { top: 6px; right: 26%; }
+    .poker-table-area .seat-BTN { top: 40%; right: 8px; transform: translateY(-50%); }
+    .poker-table-area .seat-SB  { bottom: 6px; right: 26%; }
+    .poker-table-area .seat-BB  { bottom: 6px; left: 26%; }
 
     /* Compact Bet Positions */
-    .poker-table-area.compact .bet-UTG  { top: 40%; left: 90px; transform: translateY(-50%); }
-    .poker-table-area.compact .bet-HJ   { top: 48px; left: 30%; }
-    .poker-table-area.compact .bet-CO   { top: 48px; right: 30%; }
-    .poker-table-area.compact .bet-BTN  { top: 40%; right: 90px; transform: translateY(-50%); }
-    .poker-table-area.compact .bet-SB   { bottom: 48px; right: 30%; }
-    .poker-table-area.compact .bet-BB   { bottom: 48px; left: 30%; }
+    .poker-table-area .bet-UTG  { top: 40%; left: 90px; transform: translateY(-50%); }
+    .poker-table-area .bet-HJ   { top: 48px; left: 30%; }
+    .poker-table-area .bet-CO   { top: 48px; right: 30%; }
+    .poker-table-area .bet-BTN  { top: 40%; right: 90px; transform: translateY(-50%); }
+    .poker-table-area .bet-SB   { bottom: 48px; right: 30%; }
+    .poker-table-area .bet-BB   { bottom: 48px; left: 30%; }
 
     /* --- CONTENT BOX TYPOGRAPHY RENDERING --- */
-#html-answer-target h1, 
-#html-answer-target h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 14px 0 8px 0;
-}
+    #html-answer-target h1, 
+    #html-answer-target h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 14px 0 8px 0;
+    }
 
-#html-answer-target h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #f1f5f9;
-  margin: 12px 0 6px 0;
-}
+    #html-answer-target h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin: 12px 0 6px 0;
+    }
 
-#html-answer-target strong, 
-#html-answer-target b {
-  font-weight: 700;
-  color: #3b82f6; /* Accents key terms in blue */
-}
+    #html-answer-target strong, 
+    #html-answer-target b {
+      font-weight: 700;
+      color: #3b82f6;
+    }
 
-#html-answer-target ul, 
-#html-answer-target ol {
-  margin: 8px 0;
-  padding-left: 24px;
-}
+    #html-answer-target ul, 
+    #html-answer-target ol {
+      margin: 8px 0;
+      padding-left: 24px;
+    }
 
-#html-answer-target li {
-  margin-bottom: 4px;
-  line-height: 1.6;
-}
+    #html-answer-target li {
+      margin-bottom: 4px;
+      line-height: 1.6;
+    }
 
-#html-answer-target code {
-  font-family: monospace;
-  background-color: #0f172a;
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: #f87171;
-}
-  </style>
+    #html-answer-target code {
+      font-family: monospace;
+      background-color: #0f172a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #f87171;
+    }
