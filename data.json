@@ -27,8 +27,13 @@
           {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
         ],
         "choices": [
-          {"hand": "KcTc", "Ts9s", "targetCategory": "Donk 10.0 BB"},
-          {"hand": "AhQh", "targetCategory": "Check"}
+          {"hand": "KcTc", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "Ts9s", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "9d8d", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "7h8h", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "Ac8c", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "QsJs", "targetCategory": "Check"},
+         {"hand": "KhJh", "targetCategory": "Check"}
         ]
       }
  ]
