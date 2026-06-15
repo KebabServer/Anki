@@ -1,4 +1,4 @@
- {
+ [{
         "nodeId": "poker_demo_001",
         "title": "BB Defense vs BTN Open Strategy Matrix",
         "pot": "3.50 BB",
@@ -18,3 +18,4 @@
           {"hand": "2h2d", "targetCategory": "Call"}
         ]
       }
+ ]
