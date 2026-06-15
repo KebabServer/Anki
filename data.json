@@ -52,20 +52,21 @@
         "players": [
           {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
           {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
-          {"position": "CO", "isActive": true, "isTurn": true, "stackSize": "164.82 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": true, "isTurn": true, "stackSize": "164.82 BB", "currentBet": "4.50 BB"},
           {"position": "BTN", "isActive": false, "isTurn": false, "stackSize": "198.61 BB", "currentBet": "0.00 BB"},
           {"position": "SB", "isActive": true, "isTurn": false, "stackSize": "104.8 BB", "currentBet": "0.00 BB", "isHero": true},
           {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
         ],
         "choices": [
-         {"hand": "5c4c", "targetCategory": "Minraise"},
-          {"hand": "KcTc", "targetCategory": "Donk 10.0 BB"},
-          {"hand": "Ts9s", "targetCategory": "Donk 10.0 BB"},
-          {"hand": "9d8d", "targetCategory": "Donk 10.0 BB"},
-          {"hand": "7h8h", "targetCategory": "Donk 10.0 BB"},
-          {"hand": "Ac8c", "targetCategory": "Donk 10.0 BB"},
-          {"hand": "QsJs", "targetCategory": "Check"},
-         {"hand": "KhJh", "targetCategory": "Check"}
+         {"hand": "5c4c", "targetCategory": "Small raise"},
+          {"hand": "7d7h", "targetCategory": "Small raise"},
+          {"hand": "AhKc", "targetCategory": "Small raise"},
+          {"hand": "AcQc", "targetCategory": "Small raise"},
+         {"hand": "7d6d", "targetCategory": "Small raise"},
+          {"hand": "8c7c", "targetCategory": "Small raise"},
+          {"hand": "5d5s", "targetCategory": "Small raise"},
+         {"hand": "QcJc", "targetCategory": "Fold"},
+         {"hand": "Tc9c", "targetCategory": "Fold"},
         ]
       }
  ]
