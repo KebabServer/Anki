@@ -216,31 +216,34 @@ function initEngineUtilities(deckData, activeIndexCallback) {
     let sessionCompleted = 0;
     let draggedElement = null;
 
-    async function init() {
-      try {
-        const response = await fetch('data.json');
-        if (!response.ok) throw new Error('Network configuration lookup error.');
-        deck = await response.json();
-      } catch (error) {
-        console.warn('Could not cleanly load an external data.json resource. Falling back onto the embedded runtime repository.');
-        deck = fallbackDeck;
-      }
-      
-      // Filter algorithm out cards currently locked down as mastered status (Value: 2)
-      sessionQueue = deck.filter(card => !stats[card.nodeId] || stats[card.nodeId] < 2);
-      
-      if (sessionQueue.length === 0) {
-        // Recycle state parameters to ensure endless loops during evaluation
-        sessionQueue = [...deck];
-        stats = {};
-        localStorage.removeItem('flashcard_engine_stats');
-      }
+   async function init() {
+  try {
+    const response = await fetch('data.json');
+    if (!response.ok) throw new Error('Network configuration lookup error.');
+    deck = await response.json();
+  } catch (error) {
+    console.warn('Could not cleanly load an external data.json resource. Falling back onto the embedded runtime repository.');
+    deck = fallbackDeck;
+  }
+  
+  // --- ADD THIS LINE TO FIX THE BUTTON & DROPDOWN ---
+  initEngineUtilities(deck); 
+  
+  // Filter algorithm out cards currently locked down as mastered status (Value: 2)
+  sessionQueue = deck.filter(card => !stats[card.nodeId] || stats[card.nodeId] < 2);
+  
+  if (sessionQueue.length === 0) {
+    // Recycle state parameters to ensure endless loops during evaluation
+    sessionQueue = [...deck];
+    stats = {};
+    localStorage.removeItem('flashcard_engine_stats');
+  }
 
-      sessionTotal = sessionQueue.length;
-      sessionCompleted = 0;
-      updateProgress();
-      nextCard();
-    }
+  sessionTotal = sessionQueue.length;
+  sessionCompleted = 0;
+  updateProgress();
+  nextCard();
+}
 
     function updateProgress() {
       document.getElementById('progress-text').innerText = `${sessionCompleted} / ${sessionTotal} Decks Evaluation`;
