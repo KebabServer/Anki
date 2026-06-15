@@ -1,4 +1,11 @@
- [{
+ [
+  {
+    "nodeId": "anki_sec_001",
+    "quizType": "anki",
+    "question": "What is the primary difference between Symmetric and Asymmetric encryption?",
+    "answer": "Symmetric encryption uses a single, shared secret key to both encrypt and decrypt data. Asymmetric encryption uses a mathematically linked public-private key pair, where data encrypted with the public key can only be decrypted by the corresponding private key."
+  },
+  {
         "nodeId": "poker_demo_001",
         "title": "BB Defense vs BTN Open Strategy Matrix",
         "pot": "3.50 BB",
