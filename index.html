@@ -68,18 +68,18 @@
   <script>
     // --- INTEGRATED SUIT MAP & RENDER LOGIC ---
     const SUIT_MAP = {
-      'h': { className: 'hearts', symbol: '♥' },
-      'd': { className: 'diamonds', symbol: '♦' },
-      'c': { className: 'clubs', symbol: '♣' },
-      's': { className: 'spades', symbol: '♠' }
+      'h': { className: 'hearts', symbol: '♥', color: '#dc2626' },
+      'd': { className: 'diamonds', symbol: '♦', color: '#2563eb' },
+      'c': { className: 'clubs', symbol: '♣', color: '#16a34a' },
+      's': { className: 'spades', symbol: '♠', color: '#1e293b' }
     };
 
     function parseCardHtml(cardStr) {
       if (cardStr === '??' || !cardStr) return `<div class="card card-back"></div>`;
       const suitLetter = cardStr.slice(-1).toLowerCase();
       const value = cardStr.substring(0, cardStr.length - 1);
-      const suitData = SUIT_MAP[suitLetter] || { className: '', symbol: '' };
-      return `<div class="card ${suitData.className}"><span>${value}</span><span>${suitData.symbol}</span></div>`;
+      const suitData = SUIT_MAP[suitLetter] || { className: '', symbol: '', color: '' };
+      return `<div class="card ${suitData.className}" data-suit="${suitLetter}"><span>${value}</span><span style="color: ${suitData.color}">${suitData.symbol}</span></div>`;
     }
 
     function generateChipStackHtml(betString) {
@@ -91,56 +91,13 @@
       if (numVal >= 2.5 && numVal < 10) chipColor = '#3b82f6';
       if (numVal >= 10) chipColor = '#334155';
 
-      let dynamicStackCount = 1;
-      if (numVal > 1.5) dynamicStackCount = 2;
-      if (numVal >= 2.5) dynamicStackCount = 3;
-      if (numVal >= 8) dynamicStackCount = 4;
-      if (numVal >= 11) dynamicStackCount = 5;
+      let dynamicStackCount = Math.min(5, Math.floor(numVal / 2.5) + 1);
 
       let htmlString = '<div class="chip-stack">';
       for (let i = 0; i < dynamicStackCount; i++) {
         htmlString += `<div class="poker-chip" style="background: ${chipColor}; bottom: ${i * 2}px; z-index: ${i};"></div>`;
       }
       return htmlString + '</div>';
-    }
-
-    // --- UTILITY CONTROLS EXTENSION INITIALIZATION ---
-    function initEngineUtilities(deckData, activeIndexCallback) {
-      const selector = document.getElementById('quiz-selector');
-      const resetBtn = document.getElementById('reset-memory-btn');
-
-      if (selector && Array.isArray(deckData)) {
-        selector.innerHTML = deckData.map((card, idx) => {
-          const typeLabel = card.quizType ? `[${card.quizType.toUpperCase()}]` : '[QUIZ]';
-          const summaryText = card.question || card.title || card.displayText || `Item ${idx + 1}`;
-          const truncatedSummary = summaryText.length > 45 ? summaryText.substring(0, 45) + '...' : summaryText;
-          return `<option value="${idx}">${typeLabel} ${truncatedSummary}</option>`;
-        }).join('');
-
-        selector.value = currentCardIndex;
-
-        selector.addEventListener('change', (e) => {
-          const selectedIdx = parseInt(e.target.value, 10);
-          currentCardIndex = selectedIdx;
-          if (typeof renderCurrentCard === 'function') {
-            renderCurrentCard();
-          } else if (typeof activeIndexCallback === 'function') {
-            activeIndexCallback(selectedIdx);
-          }
-        });
-      }
-
-      if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-          const configurationConfirmed = confirm(
-            "Are you absolutely sure you want to reset your engine memory?\n\nThis will permanently wipe all local storage quiz logs, tracking metrics, and historical card mastery rankings. This operation cannot be undone."
-          );
-          if (configurationConfirmed) {
-            localStorage.removeItem('flashcard_engine_stats');
-            window.location.reload();
-          }
-        });
-      }
     }
 
     // --- FALLBACK INTERNAL REPOSITORY ---
@@ -177,10 +134,10 @@
         "quizType": "multiple_choice",
         "question": "Which of the following describes an idempotent API method execution footprint?",
         "options": [
-          "Every execution modifies server memory state deterministically.",
-          "Making multiple identical requests has the same side-effect profile as a single request.",
-          "The method guarantees encryption handling routines via SSL headers.",
-          "Requests always return cached values without executing database calls."
+          { "text": "Every execution modifies server memory state deterministically." },
+          { "text": "Making multiple identical requests has the same side-effect profile as a single request." },
+          { "text": "The method guarantees encryption handling routines via SSL headers." },
+          { "text": "Requests always return cached values without executing database calls." }
         ],
         "correctIndex": 1
       },
@@ -221,7 +178,6 @@
     let deck = [];
     let sessionQueue = [];
     let currentCard = null;
-    let currentCardIndex = 0;
     let stats = JSON.parse(localStorage.getItem('flashcard_engine_stats')) || {};
     let isCompactMode = true;
 
@@ -235,7 +191,7 @@
         if (!response.ok) throw new Error('Network configuration lookup error.');
         deck = await response.json();
       } catch (error) {
-        console.warn('Could not cleanly load an external data.json resource. Falling back onto the embedded runtime repository.');
+        console.warn('Fallback to internal repository.');
         deck = fallbackDeck;
       }
 
@@ -254,8 +210,42 @@
       nextCard();
     }
 
+    function initEngineUtilities(deckData) {
+      const selector = document.getElementById('quiz-selector');
+      const resetBtn = document.getElementById('reset-memory-btn');
+
+      if (selector && Array.isArray(deckData)) {
+        selector.innerHTML = deckData.map((card, idx) => {
+          const typeLabel = card.quizType ? `[${card.quizType.toUpperCase()}]` : '[QUIZ]';
+          const summaryText = card.question || card.title || card.displayText || `Item ${idx + 1}`;
+          const truncatedSummary = summaryText.length > 45 ? summaryText.substring(0, 45) + '...' : summaryText;
+          return `<option value="${card.nodeId}">${typeLabel} ${truncatedSummary}</option>`;
+        }).join('');
+
+        selector.addEventListener('change', (e) => {
+          const targetNodeId = e.target.value;
+          const targetCard = deck.find(c => c.nodeId === targetNodeId);
+          if (targetCard) {
+            currentCard = targetCard;
+            // Remote jump breaks execution tracking; pull out of running standard flow safely
+            const container = document.getElementById('card-container');
+            renderCardRouter(currentCard, container);
+          }
+        });
+      }
+
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          if (confirm("Permanently wipe local storage execution tracking logs?")) {
+            localStorage.removeItem('flashcard_engine_stats');
+            window.location.reload();
+          }
+        });
+      }
+    }
+
     function updateProgress() {
-      document.getElementById('progress-text').innerText = `${sessionCompleted} / ${sessionTotal} Decks Evaluation`;
+      document.getElementById('progress-text').innerText = `${sessionCompleted} / ${sessionTotal} Cards Handled`;
       const pct = sessionTotal === 0 ? 0 : (sessionCompleted / sessionTotal) * 100;
       document.getElementById('progress-bar').style.width = `${pct}%`;
     }
@@ -269,29 +259,31 @@
       saveProgress(currentCard.nodeId, masteryValue);
       if (masteryValue === 0) {
         sessionQueue.push(currentCard);
-        sessionTotal++;
+      } else {
+        sessionCompleted++;
       }
-      sessionCompleted++;
+      
       updateProgress();
       nextCard();
     }
 
     function nextCard() {
       const container = document.getElementById('card-container');
+      const selector = document.getElementById('quiz-selector');
 
       if (sessionQueue.length === 0) {
         container.innerHTML = `
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 48px 0; flex-grow: 1;">
             <div style="background: rgba(20,83,45,0.4); padding: 16px; border-radius: 9999px; border: 1px solid rgba(34,197,94,0.3); margin-bottom: 16px; font-size: 24px;">🎯</div>
             <h2 style="font-size: 24px; font-weight: 700; color: #4ade80; margin: 0 0 8px 0;">Deck Pipeline Evaluated!</h2>
-            <p style="color: #94a3b8; font-size: 14px; max-width: 380px; margin: 0;">Spaced repetition interval registers all cards in active loops as synchronized.</p>
-            <button onclick="localStorage.removeItem('flashcard_engine_stats'); location.reload();" style="margin-top: 24px; padding: 8px 16px; background: #475569; border: none; color: white; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">Reset Local Cache & Re-run</button>
+            <button onclick="localStorage.removeItem('flashcard_engine_stats'); location.reload();" style="margin-top: 24px; padding: 8px 16px; background: #475569; border: none; color: white; border-radius: 4px; cursor: pointer;">Reset Cache</button>
           </div>
         `;
         return;
       }
 
       currentCard = sessionQueue.shift();
+      if(selector) selector.value = currentCard.nodeId;
       renderCardRouter(currentCard, container);
     }
 
@@ -302,7 +294,7 @@
         case 'multiple_choice': return renderMultipleChoiceMode(card, container);
         case 'drag_drop': return renderStandardDragDropMode(card, container);
         case 'poker_drag': return renderAdvancedPokerMode(card, container);
-        default: container.innerHTML = `<p style="color: #f87171; padding: 16px;">Unknown card architecture exception context: ${card.quizType}</p>`;
+        default: container.innerHTML = `<p style="color: #f87171; padding: 16px;">Unknown execution layout mapping.</p>`;
       }
     }
 
@@ -314,17 +306,14 @@
             <span class="badge badge-blue">Standard Flashcard</span>
             <h2 style="font-size: 1.125rem; font-weight: 500; color: white; margin-top: 16px; line-height: 1.6;">${card.question}</h2>
           </div>
-          
           <div id="answer-area" class="hidden" style="flex-direction: column; width: 100%; margin-top: 24px; background: rgba(15,23,42,0.4); border: 1px solid rgba(51,65,85,0.5); border-radius: 12px; padding: 16px; box-sizing: border-box;">
-            <div id="html-answer-target" style="font-size: 14px; color: #cbd5e1; line-height: 1.6;">${card.answer}</div>
-            
+            <div style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom:16px;">${card.answer}</div>
             <div class="grid-3-col">
               <button onclick="handleCardComplete(0)" class="btn-rating btn-rate-bad">Badly (Re-queue)</button>
               <button onclick="handleCardComplete(1)" class="btn-rating btn-rate-ok">OK (Keep Loop)</button>
               <button onclick="handleCardComplete(2)" class="btn-rating btn-rate-well">Well (Mastered)</button>
             </div>
           </div>
-          
           <button id="show-btn" class="btn-primary" style="margin-top: 32px;">Show Answer Formulation</button>
         </div>
       `;
@@ -340,7 +329,7 @@
     // --- 2. MODE: MULTIPLE CHOICE OPTION PARSER ---
     function renderMultipleChoiceMode(card, container) {
       const optionsHtml = card.options.map((opt, i) =>
-        `<button data-idx="${i}" class="mc-btn"><span class="mc-prefix">${String.fromCharCode(65 + i)}</span> <span>${opt}</span></button>`
+        `<button data-idx="${i}" class="mc-btn"><span class="mc-prefix">${String.fromCharCode(65 + i)}</span> <span>${opt.text || opt}</span></button>`
       ).join('');
 
       container.innerHTML = `
@@ -361,7 +350,7 @@
           if (container.querySelector('.pointer-events-none')) return;
 
           btns.forEach(b => b.classList.add('pointer-events-none', 'opacity-40'));
-          const selectedIdx = parseInt(currentTarget.dataset.idx);
+          const selectedIdx = parseInt(currentTarget.dataset.idx, 10);
           const isCorrect = selectedIdx === card.correctIndex;
 
           currentTarget.classList.remove('opacity-40');
@@ -400,178 +389,118 @@
           <div>
             <span class="badge badge-purple">Categorized Sorting</span>
             <h2 style="font-size: 1rem; font-weight: 500; color: #e2e8f0; margin: 12px 0 16px 0; line-height: 1.6;">${card.question}</h2>
-            
-            <div id="source-zone" class="source-box" ondragover="dragOver(event)" ondrop="dropSource(event)">
-              ${draggablesHtml}
-            </div>
-            
+            <div id="source-zone" class="source-box" ondragover="dragOver(event)" ondrop="dropSource(event)">${draggablesHtml}</div>
             <div class="drag-container">${dropzonesHtml}</div>
           </div>
           <button id="dd-next" class="hidden btn-primary" style="margin-top: 24px;">Submit Classifications</button>
         </div>
       `;
+      container.dataset.totalItems = card.choices.length;
+    }
+
+    // --- 4. MODE: ADVANCED POKER STRATEGY MATRIX ---
+    function renderAdvancedPokerMode(card, container) {
+      let playersHtml = '';
+      let betsHtml = '';
+
+      card.players.forEach(player => {
+        let holeCardsHtml = '';
+        if (player.isActive) {
+          holeCardsHtml = (player.holeCards && player.holeCards.length > 0) 
+            ? player.holeCards.map(parseCardHtml).join('') 
+            : parseCardHtml('??') + parseCardHtml('??');
+        }
+
+        const isTurnClass = player.isTurn ? 'active-turn' : '';
+        const isActiveClass = player.isActive ? '' : 'inactive';
+        const dealerButtonHtml = player.position === 'BTN' ? '<div class="dealer-button">D</div>' : '';
+        const heroLabel = player.isHero ? '<span class="hero-label">(H)</span>' : '';
+
+        playersHtml += `
+          <div class="player-seat seat-${player.position} ${isTurnClass} ${isActiveClass}">
+            ${dealerButtonHtml}
+            <div class="player-position">${player.position}${heroLabel}</div>
+            <div class="player-stack">${player.stackSize}</div>
+            <div class="hole-cards">${holeCardsHtml}</div>
+          </div>
+        `;
+
+        if (parseFloat(player.currentBet) > 0) {
+          betsHtml += `
+            <div class="bet-indicator bet-${player.position}">
+              ${generateChipStackHtml(player.currentBet)}
+              <span>${player.currentBet}</span>
+            </div>
+          `;
+        }
+      });
+
+      let communityCardsHtml = (!card.communityCards || card.communityCards.length === 0) 
+        ? `<span class="preflop-runtime-badge">PREFLOP RUNTIME</span>` 
+        : card.communityCards.map(parseCardHtml).join('');
+
+      const categories = [...new Set(card.choices.map(c => c.targetCategory))];
+      const randomizedChoices = [...card.choices].sort(() => Math.random() - 0.5);
+
+      let draggablesHtml = randomizedChoices.map((c, i) => {
+        const suitLetter = c.hand.slice(-1).toLowerCase();
+        const rawValue = c.hand.substring(0, c.hand.length - 1);
+        const look = SUIT_MAP[suitLetter] || { symbol: suitLetter, color: '#f1f5f9' };
+
+        return `
+          <div draggable="true" data-target="${c.targetCategory}" id="poker-item-${i}" class="draggable-token" ondragstart="dragStart(event)">
+            ${rawValue}<span style="color: ${look.color}; margin-left: 2px; font-size: 1.1em;">${look.symbol}</span>
+          </div>
+        `;
+      }).join('');
+
+      let dropzonesHtml = categories.map(cat => `
+        <div class="dropzone-container">
+          <h3 class="dropzone-header">${cat}</h3>
+          <div data-cat="${cat}" class="dropzone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
+        </div>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="poker-wrapper">
+          <div>
+            <div class="header-container">
+              <div>
+                <span class="badge-engine">Poker Matrix Engine</span>
+                <h2 class="header-title">${card.title || 'Game Matrix Checkpoint'}</h2>
+              </div>
+              <div class="toggle-container">
+                <input type="checkbox" id="compact-toggle" ${isCompactMode ? 'checked' : ''} class="toggle-input">
+                <label for="compact-toggle" class="toggle-label">Compact Engine Table</label>
+              </div>
+            </div>
+            <p class="display-text">${card.displayText}</p>
+            <div class="poker-table-area ${isCompactMode ? 'compact' : ''}">
+              <div class="center-board">
+                <div class="community-cards">${communityCardsHtml}</div>
+                <div class="pot-display">
+                  ${generateChipStackHtml(card.pot)}
+                  <span>Pot: ${card.pot}</span>
+                </div>
+              </div>
+              ${playersHtml}
+              ${betsHtml}
+            </div>
+            <div id="source-zone" class="source-zone-container">${draggablesHtml}</div>
+            <div class="dropzones-wrapper">${dropzonesHtml}</div>
+          </div>
+          <button id="dd-next" class="btn-confirm hidden">Confirm Strategic Configuration</button>
+        </div>
+      `;
+
+      document.getElementById('compact-toggle').addEventListener('change', (e) => {
+        isCompactMode = e.target.checked;
+        const tableObj = container.querySelector('.poker-table-area');
+        if (tableObj) tableObj.classList.toggle('compact', isCompactMode);
+      });
 
       container.dataset.totalItems = card.choices.length;
     }
-    // --- 4. MODE: ADVANCED POKER STRATEGY MATRIX (4-COLOR DECK + COMPACT AUTO-RESIZE) ---
-function renderAdvancedPokerMode(card, container) {
-  let playersHtml = '';
-  let betsHtml = '';
-
-  card.players.forEach(player => {
-    let holeCardsHtml = '';
-    if (player.isActive) {
-      if (player.holeCards && player.holeCards.length > 0) {
-        holeCardsHtml = player.holeCards.map(parseCardHtml).join('');
-      } else {
-        holeCardsHtml = parseCardHtml('??') + parseCardHtml('??');
-      }
-    }
-
-    const isTurnClass = player.isTurn ? 'active-turn' : '';
-    const isActiveClass = player.isActive ? '' : 'inactive';
-    const dealerButtonHtml = player.position === 'BTN' ? '<div class="dealer-button">D</div>' : '';
-    const heroLabel = player.isHero ? '<span class="hero-label">(H)</span>' : '';
-
-    playersHtml += `
-      <div class="player-seat seat-${player.position} ${isTurnClass} ${isActiveClass}">
-        ${dealerButtonHtml}
-        <div class="player-position">${player.position}${heroLabel}</div>
-        <div class="player-stack">${player.stackSize}</div>
-        <div class="hole-cards">${holeCardsHtml}</div>
-      </div>
-    `;
-
-    if (parseFloat(player.currentBet) > 0) {
-      betsHtml += `
-        <div class="bet-indicator bet-${player.position}">
-          ${generateChipStackHtml(player.currentBet)}
-          <span>${player.currentBet}</span>
-        </div>
-      `;
-    }
-  });
-
-  let communityCardsHtml = '';
-  if (!card.communityCards || card.communityCards.length === 0) {
-    communityCardsHtml = `<span class="preflop-runtime-badge">PREFLOP RUNTIME</span>`;
-  } else {
-    communityCardsHtml = card.communityCards.map(parseCardHtml).join('');
-  }
-
-  const categories = [...new Set(card.choices.map(c => c.targetCategory))];
-
-  // 1. RANDOMIZE HAND ORDER
-  const randomizedChoices = [...card.choices]
-    .map(value => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value);
-
-  // 2. APPLY 4-COLOR DECK TO DRAGGABLE CARD TOKENS
-  let draggablesHtml = randomizedChoices.map((c, i) => {
-    const formattedHand = c.hand.replace(/([2-9TJQKA10]+)([hdcs])/gi, (match, val, suit) => {
-      const s = suit.toLowerCase();
-      const suitSymbols = { 'h': '♥', 'd': '♦', 'c': '♣', 's': '♠' };
-      
-      let color = '#f1f5f9';            // Spades = White/Slate
-      if (s === 'h') color = '#ef4444'; // Hearts = Red
-      if (s === 'd') color = '#60a5fa'; // Diamonds = Blue
-      if (s === 'c') color = '#4ade80'; // Clubs = Green
-      
-      return `${val}<span style="color: ${color}; font-family: system-ui, sans-serif; margin-left: 2px; margin-right: 2px; font-size: 1.1em;">${suitSymbols[s] || s}</span>`;
-    });
-
-    return `
-      <div draggable="true" data-target="${c.targetCategory}" id="poker-item-${i}" class="draggable-token" ondragstart="dragStart(event)">
-        ${formattedHand}
-      </div>
-    `;
-  }).join('');
-
-  let dropzonesHtml = categories.map(cat => `
-    <div class="dropzone-container">
-      <h3 class="dropzone-header">${cat}</h3>
-      <div data-cat="${cat}" class="dropzone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
-    </div>
-  `).join('');
-
-  container.innerHTML = `
-    <div class="poker-wrapper">
-      <div>
-        <div class="header-container">
-          <div>
-            <span class="badge-engine">Poker Matrix Engine</span>
-            <h2 class="header-title">${card.title || 'Game Matrix Checkpoint'}</h2>
-          </div>
-          
-          <div class="toggle-container">
-            <input type="checkbox" id="compact-toggle" ${isCompactMode ? 'checked' : ''} class="toggle-input">
-            <label for="compact-toggle" class="toggle-label">Compact Engine Table</label>
-          </div>
-        </div>
-        
-        <p class="display-text">${card.displayText}</p>
-        
-        <div class="poker-table-area ${isCompactMode ? 'compact' : ''}">
-          
-          <div class="center-board">
-            <div class="community-cards">${communityCardsHtml}</div>
-            
-            <div class="pot-display">
-              ${generateChipStackHtml(card.pot)}
-              <span>Pot: ${card.pot}</span>
-            </div>
-          </div>
-
-          ${playersHtml}
-          ${betsHtml}
-        </div>
-
-        <div id="source-zone" class="source-zone-container">
-          ${draggablesHtml}
-        </div>
-
-        <div class="dropzones-wrapper">${dropzonesHtml}</div>
-      </div>
-      
-      <button id="dd-next" class="btn-confirm hidden">Confirm Strategic Configuration</button>
-    </div>
-  `;
-
-  // 3. POST-RENDER PROCESSOR: Enforce 4-Color Logic on Board & Player Hole Cards
-  container.querySelectorAll('.community-cards > *, .hole-cards > *').forEach(cardEl => {
-    const structuralText = cardEl.textContent || cardEl.innerHTML;
-    
-    if (structuralText.includes('♦') || structuralText.includes('d')) {
-      cardEl.style.setProperty('color', '#2563eb', 'important');
-      cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#2563eb', 'important'));
-    }
-    else if (structuralText.includes('♣') || structuralText.includes('c')) {
-      cardEl.style.setProperty('color', '#16a34a', 'important');
-      cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#16a34a', 'important'));
-    }
-    else if (structuralText.includes('♥') || structuralText.includes('h')) {
-      cardEl.style.setProperty('color', '#dc2626', 'important');
-      cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#dc2626', 'important'));
-    }
-    else if (structuralText.includes('♠') || structuralText.includes('s')) {
-      cardEl.style.setProperty('color', '#1e293b', 'important');
-      cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#1e293b', 'important'));
-    }
-  });
-
-  // Toggle Listener Controls
-  document.getElementById('compact-toggle').addEventListener('change', (e) => {
-    isCompactMode = e.target.checked;
-    const tableObj = container.querySelector('.poker-table-area');
-    if (tableObj) {
-      if (isCompactMode) tableObj.classList.add('compact');
-      else tableObj.classList.remove('compact');
-    }
-  });
-
-  container.dataset.totalItems = card.choices.length;
-}
 
     // --- SHARED DRAG AND DROP RUNTIME INTERACTION HANDLERS ---
     function dragStart(e) {
@@ -583,26 +512,20 @@ function renderAdvancedPokerMode(card, container) {
 
     function dragOver(e) {
       e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
       const zone = e.currentTarget;
-      if (zone.classList.contains('dropzone')) {
-        zone.classList.add('drag-active');
-      }
+      if (zone.classList.contains('dropzone')) zone.classList.add('drag-active');
     }
 
     function dragLeave(e) {
       const zone = e.currentTarget;
-      if (zone.classList.contains('dropzone')) {
-        zone.classList.remove('drag-active');
-      }
+      if (zone.classList.contains('dropzone')) zone.classList.remove('drag-active');
     }
 
     function dropSource(e) {
       e.preventDefault();
       if (!draggedElement) return;
-      draggedElement.classList.remove('opacity-40');
-
-      draggedElement.classList.remove('state-correct', 'state-incorrect');
+      draggedElement.classList.remove('opacity-40', 'state-correct', 'state-incorrect');
+      delete draggedElement.dataset.correct;
 
       document.getElementById('source-zone').appendChild(draggedElement);
       checkDragAndDropCompletionState();
@@ -620,26 +543,21 @@ function renderAdvancedPokerMode(card, container) {
 
       zone.appendChild(draggedElement);
 
-      if (expectedCategory === dropContainerCategory) {
-        draggedElement.classList.remove('state-incorrect');
-        draggedElement.classList.add('state-correct');
-        draggedElement.dataset.correct = "true";
-      } else {
-        draggedElement.classList.remove('state-correct');
-        draggedElement.classList.add('state-incorrect');
-        draggedElement.dataset.correct = "false";
-      }
+      const isCorrect = expectedCategory === dropContainerCategory;
+      draggedElement.classList.toggle('state-correct', isCorrect);
+      draggedElement.classList.toggle('state-incorrect', !isCorrect);
+      draggedElement.dataset.correct = isCorrect ? "true" : "false";
 
       checkDragAndDropCompletionState();
     }
 
     function checkDragAndDropCompletionState() {
       const container = document.getElementById('card-container');
-      const expectedTotal = parseInt(container.dataset.totalItems);
+      const expectedTotal = parseInt(container.dataset.totalItems, 10);
 
       const elementsInScope = Array.from(container.querySelectorAll('[draggable="true"]'));
       const localizedDropzonesCount = elementsInScope.filter(el => el.parentElement.classList.contains('dropzone')).length;
-      const perfectScoreValidated = elementsInScope.every(el => el.dataset.correct === "true" && el.parentElement.classList.contains('dropzone'));
+      const perfectScoreValidated = elementsInScope.every(el => el.dataset.correct === "true");
 
       const nextActionBtn = document.getElementById('dd-next');
 
@@ -652,7 +570,7 @@ function renderAdvancedPokerMode(card, container) {
     }
 
     document.addEventListener('DOMContentLoaded', init);
-  </script>
+</script>
 </body>
 
 </html>
