@@ -8,6 +8,17 @@
   <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
+  <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/40 mb-4 text-xs">
+  <div class="flex items-center gap-2 flex-grow max-w-md">
+    <label for="quiz-selector" class="text-slate-400 font-semibold whitespace-nowrap">Jump to Deck Item:</label>
+    <select id="quiz-selector" class="bg-slate-800 text-slate-200 border border-slate-700 rounded px-2.5 py-1.5 focus:outline-none focus:border-blue-500 w-full cursor-pointer font-mono text-[11px]">
+      </select>
+  </div>
+  
+  <button id="reset-memory-btn" class="bg-red-950/40 hover:bg-red-900/60 border border-red-800/60 text-red-300 px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap">
+    Reset Engine Memory
+  </button>
+</div>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center p-3 sm:p-6 select-none">
 
