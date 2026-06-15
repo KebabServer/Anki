@@ -22,24 +22,36 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Common Card Styles */
+   /* Common Card Styles */
     .community-cards { display: flex; gap: 4px; z-index: 10; transition: all 0.3s; }
+    
+    /* Community cards are now smaller by default */
     .card {
+      width: 22px;          /* Decreased from 26px */
+      height: 30px;         /* Decreased from 36px */
       background: white;
-      border-radius: 4px;
+      border-radius: 3px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      font-size: 11px;      /* Text size remains unchanged */
+      box-shadow: 0 3px 5px rgba(0,0,0,0.3);
       line-height: 1.1;
       user-select: none;
       transition: all 0.3s;
+      border: 0.5px solid #e2e8f0;
     }
     .card.hearts, .card.diamonds { color: #dc2626; }
     .card.clubs, .card.spades { color: #0f172a; }
     .card-back { background: repeating-linear-gradient(45deg, #1d4ed8, #1d4ed8 4px, #1e40af 4px, #1e40af 8px); border: 1px solid #93c5fd; }
+
+    /* Player hole cards scale back up to fit their seats perfectly */
+    .player-seat .card {
+      width: 26px;
+      height: 36px;
+    }
 
     /* Common Player Seat Configurations */
     .player-seat {
@@ -94,14 +106,11 @@
       box-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
 
-    /* --- LOCKED COMPACT ENGINE RULES --- */
+   /* --- LOCKED COMPACT ENGINE RULES --- */
     .poker-table-area {
       height: 190px;
       border: 8px solid #1e293b;
       border-radius: 95px;
-    }
-    .poker-table-area .card {
-      width: 26px; height: 36px; font-size: 11px; border: 0.5px solid #e2e8f0;
     }
     .poker-table-area .player-seat {
       padding: 2px 6px; border-radius: 6px; font-size: 9px; min-width: 65px; border-width: 1px;
@@ -124,13 +133,13 @@
     .poker-table-area .seat-SB  { bottom: 6px; right: 26%; }
     .poker-table-area .seat-BB  { bottom: 6px; left: 26%; }
 
-    /* Compact Bet Positions */
+    /* Adjusted Compact Bet Positions to avoid overlapping center cards */
     .poker-table-area .bet-UTG  { top: 40%; left: 90px; transform: translateY(-50%); }
-    .poker-table-area .bet-HJ   { top: 48px; left: 30%; }
-    .poker-table-area .bet-CO   { top: 48px; right: 30%; }
+    .poker-table-area .bet-HJ   { top: 42px; left: 29%; }    /* Shifted up away from center */
+    .poker-table-area .bet-CO   { top: 42px; right: 29%; }   /* Shifted up away from center */
     .poker-table-area .bet-BTN  { top: 40%; right: 90px; transform: translateY(-50%); }
-    .poker-table-area .bet-SB   { bottom: 48px; right: 30%; }
-    .poker-table-area .bet-BB   { bottom: 48px; left: 30%; }
+    .poker-table-area .bet-SB   { bottom: 54px; right: 29%; } /* Shifted down away from center */
+    .poker-table-area .bet-BB   { bottom: 54px; left: 29%; }  /* Shifted down away from center */
 
     /* --- CONTENT BOX TYPOGRAPHY RENDERING --- */
     #html-answer-target h1, 
