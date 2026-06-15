@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +8,234 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://bernardo-castilho.github.io/DragDropTouch/DragDropTouch.js"></script>
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .fade-enter { animation: fadeIn 0.3s ease-in forwards; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* Poker Table Surface */
+    .poker-table-area {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      background: radial-gradient(ellipse, #0f766e, #064e3b);
+      border: 12px solid #1e293b;
+      border-radius: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2rem 0;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6), 0 10px 20px rgba(0, 0, 0, 0.3);
     }
-    .drag-active { border-color: #3b82f6 !important; background-color: rgba(59, 130, 246, 0.1); }
-    .poker-table { background: radial-gradient(circle, #065f46 0%, #022c22 100%); }
+
+    /* Cards */
+    .community-cards {
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .card {
+      width: 36px;
+      height: 52px;
+      background: white;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      border: 1px solid #ccc;
+      line-height: 1.1;
+    }
+
+    .card.hearts,
+    .card.diamonds {
+      color: #dc2626;
+    }
+
+    .card.clubs,
+    .card.spades {
+      color: #0f172a;
+    }
+
+    .card-back {
+      background: repeating-linear-gradient(45deg, #1e40af, #1e40af 5px, #1e3a8a 5px, #1e3a8a 10px);
+    }
+
+    /* Seats & Dealer Button */
+    .player-seat {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: #334155;
+      border: 2px solid #475569;
+      font-size: 12px;
+      transition: all 0.3s;
+      z-index: 20;
+      min-width: 80px;
+    }
+
+    .player-seat.active-turn {
+      box-shadow: 0 0 15px #facc15;
+      border-color: #facc15;
+    }
+
+    .player-seat.inactive {
+      opacity: 0.4;
+    }
+
+    .player-seat .hole-cards {
+      display: flex;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .dealer-button {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      width: 20px;
+      height: 20px;
+      background: #f8fafc;
+      color: #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      border: 1px solid #475569;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      z-index: 25;
+    }
+
+    /* Chip Stacks & Bets */
+    .bet-indicator {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 11px;
+      font-weight: bold;
+      color: #cbd5e1;
+      z-index: 15;
+    }
+
+    .chip-stack {
+      position: relative;
+      width: 20px;
+      height: 10px;
+      margin-bottom: 20px;
+    }
+
+    .poker-chip {
+      position: absolute;
+      left: 0;
+      width: 20px;
+      height: 6px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    }
+
+    /* 6-Max Geometric Layout Constraints */
+    .seat-UTG {
+      top: 40%;
+      left: -30px;
+      transform: translateY(-50%);
+    }
+
+    .seat-HJ {
+      top: -20px;
+      left: 20%;
+    }
+
+    .seat-CO {
+      top: -20px;
+      right: 20%;
+    }
+
+    .seat-BTN {
+      top: 40%;
+      right: -30px;
+      transform: translateY(-50%);
+    }
+
+    .seat-SB {
+      bottom: -20px;
+      right: 20%;
+    }
+
+    .seat-BB {
+      bottom: -20px;
+      left: 20%;
+    }
+
+    .bet-UTG {
+      top: 40%;
+      left: 70px;
+      transform: translateY(-50%);
+    }
+
+    .bet-HJ {
+      top: 60px;
+      left: 25%;
+    }
+
+    .bet-CO {
+      top: 60px;
+      right: 25%;
+    }
+
+    .bet-BTN {
+      top: 40%;
+      right: 70px;
+      transform: translateY(-50%);
+    }
+
+    .bet-SB {
+      bottom: 60px;
+      right: 25%;
+    }
+
+    .bet-BB {
+      bottom: 60px;
+      left: 25%;
+    }
+  </style>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .fade-enter {
+      animation: fadeIn 0.3s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .drag-active {
+      border-color: #3b82f6 !important;
+      background-color: rgba(59, 130, 246, 0.1);
+    }
+
+    .poker-table {
+      background: radial-gradient(circle, #065f46 0%, #022c22 100%);
+    }
   </style>
 </head>
+
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center p-4 sm:p-8">
 
   <div class="w-full max-w-3xl mb-6">
@@ -29,7 +248,8 @@
     </div>
   </div>
 
-  <div id="card-container" class="w-full max-w-3xl bg-slate-800 rounded-xl shadow-2xl p-6 sm:p-8 min-h-[400px] flex flex-col relative fade-enter">
+  <div id="card-container"
+    class="w-full max-w-3xl bg-slate-800 rounded-xl shadow-2xl p-6 sm:p-8 min-h-[400px] flex flex-col relative fade-enter">
     <div class="flex items-center justify-center h-full text-slate-400">Loading deck...</div>
   </div>
 
@@ -39,6 +259,27 @@
      * Mock data is provided here as a fallback to ensure the app runs immediately.
      */
     const fallbackDeck = [
+      {
+        "nodeId": "preflop_001",
+        "title": "BB Defense vs BTN Open",
+        "phase": "PREFLOP",
+        "pot": "3.50 BB",
+        "communityCards": ["As", "Ah", "Kc"],
+        "quizType": "poker_drag",
+        "displayText": "The BTN opens to 2.5 BB. Action is on you in the Big Blind.",
+        "players": [
+          { "position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100 BB", "currentBet": "0 BB" },
+          { "position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100 BB", "currentBet": "0 BB" },
+          { "position": "CO", "isActive": false, "isTurn": false, "stackSize": "100 BB", "currentBet": "0 BB" },
+          { "position": "BTN", "isActive": true, "isTurn": false, "stackSize": "100 BB", "currentBet": "2.50 BB" },
+          { "position": "SB", "isActive": false, "isTurn": false, "stackSize": "99.50 BB", "currentBet": "0.50 BB" },
+          { "position": "BB", "isActive": true, "isTurn": true, "stackSize": "89.00 BB", "currentBet": "1.00 BB", "holeCards": ["Ah", "Kh"], "isHero": true }
+        ],
+        "choices": [
+          { "hand": "AhKh", "targetCategory": "Raise/3-Bet" },
+          { "hand": "2h2d", "targetCategory": "Call" }
+        ]
+      },
       {
         "nodeId": "anki_001",
         "quizType": "anki",
@@ -62,29 +303,10 @@
           { "text": "Tailwind", "targetCategory": "Styling" },
           { "text": "Vue", "targetCategory": "Framework/Library" }
         ]
-      },
-      {
-        "nodeId": "preflop_001",
-        "title": "BB Defense vs BTN Open",
-        "phase": "PREFLOP",
-        "pot": "3.50 BB",
-        "communityCards": [],
-        "quizType": "poker_drag",
-        "displayText": "The BTN opens to 2.5 BB. Action is on you in the Big Blind.",
-        "players": [
-          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100 BB", "currentBet": "0 BB"},
-          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100 BB", "currentBet": "0 BB"},
-          {"position": "CO", "isActive": false, "isTurn": false, "stackSize": "100 BB", "currentBet": "0 BB"},
-          {"position": "BTN", "isActive": true, "isTurn": false, "stackSize": "100 BB", "currentBet": "2.50 BB"},
-          {"position": "SB", "isActive": false, "isTurn": false, "stackSize": "99.50 BB", "currentBet": "0.50 BB"},
-          {"position": "BB", "isActive": true, "isTurn": true, "stackSize": "89.00 BB", "currentBet": "1.00 BB", "holeCards": ["Ah", "Kh"], "isHero": true}
-        ],
-        "choices": [
-          {"hand": "AhKh", "targetCategory": "Raise/3-Bet"},
-          {"hand": "2h2d", "targetCategory": "Call"}
-        ]
       }
     ];
+
+
 
     // --- APPLICATION STATE ---
     let deck = [];
@@ -95,6 +317,13 @@
     let sessionCompleted = 0;
 
     // --- INITIALIZATION ---
+    const SUIT_MAP = {
+      'h': { className: 'hearts', symbol: '♥' },
+      'd': { className: 'diamonds', symbol: '♦' },
+      'c': { className: 'clubs', symbol: '♣' },
+      's': { className: 'spades', symbol: '♠' }
+    };
+
     async function init() {
       try {
         const response = await fetch('data.json');
@@ -104,15 +333,15 @@
         console.warn('Could not load data.json, using fallback data.');
         deck = fallbackDeck;
       }
-      
+
       // Filter out cards mastered ("Well" - state 2) today for spaced repetition
       // For this demo, we just load everything not marked '2'
       sessionQueue = deck.filter(card => !stats[card.nodeId] || stats[card.nodeId] < 2);
-      
+
       if (sessionQueue.length === 0) {
         // Reset if all done
         sessionQueue = [...deck];
-        stats = {}; 
+        stats = {};
         localStorage.removeItem('flashcard_stats');
       }
 
@@ -164,7 +393,7 @@
 
     // --- RENDERING ROUTER ---
     function renderCard(card, container) {
-      container.innerHTML = ''; 
+      container.innerHTML = '';
       switch (card.quizType) {
         case 'anki': return renderAnki(card, container);
         case 'multiple_choice': return renderMultipleChoice(card, container);
@@ -200,7 +429,7 @@
 
     // --- 2. MULTIPLE CHOICE ---
     function renderMultipleChoice(card, container) {
-      const optionsHtml = card.options.map((opt, i) => 
+      const optionsHtml = card.options.map((opt, i) =>
         `<button data-idx="${i}" class="mc-btn w-full text-left p-4 bg-slate-700 hover:bg-slate-600 rounded-lg border border-slate-600 transition-colors">${opt}</button>`
       ).join('');
 
@@ -215,10 +444,10 @@
         btn.addEventListener('click', (e) => {
           if (container.querySelector('.pointer-events-none')) return; // already answered
           btns.forEach(b => b.classList.add('pointer-events-none', 'opacity-50'));
-          
+
           const isCorrect = parseInt(e.target.dataset.idx) === card.correctIndex;
           e.target.classList.remove('bg-slate-700', 'hover:bg-slate-600', 'opacity-50');
-          
+
           if (isCorrect) {
             e.target.classList.add('bg-green-600', 'border-green-500', 'text-white');
           } else {
@@ -237,7 +466,7 @@
     // --- 3. STANDARD DRAG & DROP ---
     function renderDragDrop(card, container) {
       const categories = [...new Set(card.choices.map(c => c.targetCategory))];
-      let draggablesHtml = card.choices.map((c, i) => 
+      let draggablesHtml = card.choices.map((c, i) =>
         `<div draggable="true" data-target="${c.targetCategory}" class="cursor-grab active:cursor-grabbing p-3 bg-slate-600 rounded shadow border border-slate-500 text-center" ondragstart="dragStart(event)">${c.text || c.hand}</div>`
       ).join('');
 
@@ -263,59 +492,126 @@
     }
 
     // --- 4. POKER STRATEGY MATRIX ---
+    function parseCardHtml(cardStr) {
+      if (cardStr === '??' || !cardStr) return `<div class="card card-back"></div>`;
+      const suitLetter = cardStr.slice(-1).toLowerCase();
+      const value = cardStr.substring(0, cardStr.length - 1);
+      const suitData = SUIT_MAP[suitLetter] || { className: '', symbol: '' };
+      return `<div class="card ${suitData.className}">${value}<br>${suitData.symbol}</div>`;
+    }
+
+    function generateChipStackHtml(betString) {
+      const numVal = parseFloat(betString);
+      if (isNaN(numVal) || numVal <= 0) return '';
+
+      let chipColor = '#dcdde1';
+      if (numVal >= 1 && numVal < 2.5) chipColor = '#e74c3c';
+      if (numVal >= 2.5 && numVal < 10) chipColor = '#2980b9';
+      if (numVal >= 10) chipColor = '#2c3e50';
+
+      let dynamicStackCount = 1;
+      if (numVal > 1.5) dynamicStackCount = 2;
+      if (numVal >= 2.5) dynamicStackCount = 3;
+      if (numVal >= 8) dynamicStackCount = 4;
+      if (numVal >= 11) dynamicStackCount = 5;
+
+      let htmlString = '<div class="chip-stack">';
+      for (let i = 0; i < dynamicStackCount; i++) {
+        htmlString += `<div class="poker-chip" style="background: ${chipColor}; bottom: ${i * 3}px; z-index: ${i};"></div>`;
+      }
+      return htmlString + '</div>';
+    }
+
     function renderPokerDrag(card, container) {
-      // 1. Build Table UI
-      const positionsHtml = card.players.map(p => {
-        const isHero = p.isHero ? 'border-blue-500 bg-blue-900/40 shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'border-slate-600 bg-slate-800';
-        const isTurn = p.isTurn ? 'ring-2 ring-yellow-400' : '';
-        const holeCards = p.holeCards && p.holeCards.length ? `<div class="text-xs font-mono mt-1 text-yellow-300">${p.holeCards.join(' ')}</div>` : '';
-        
-        return `
-          <div class="flex flex-col items-center p-2 rounded-lg border ${isHero} ${isTurn}">
-            <span class="text-xs font-bold text-slate-400">${p.position}</span>
-            <span class="text-sm">${p.stackSize}</span>
-            <span class="text-xs text-slate-400 mt-1">${p.currentBet !== '0 BB' && p.currentBet !== '0.00 BB' ? 'Bet: ' + p.currentBet : 'Folded/Wait'}</span>
-            ${holeCards}
-          </div>
-        `;
-      }).join('');
+      // 1. Build Table State
+      let playersHtml = '';
+      let betsHtml = '';
+
+      card.players.forEach(player => {
+        let holeCardsHtml = '';
+        // Generate hole cards if player is active and has them, otherwise show backs if they are active
+        if (player.isActive) {
+          if (player.holeCards && player.holeCards.length > 0) {
+            holeCardsHtml = player.holeCards.map(parseCardHtml).join('');
+          } else {
+            holeCardsHtml = parseCardHtml('??') + parseCardHtml('??');
+          }
+        }
+
+        const isTurnClass = player.isTurn ? 'active-turn' : '';
+        const isActiveClass = player.isActive ? '' : 'inactive';
+        const dealerButtonHtml = player.position === 'BTN' ? '<div class="dealer-button">D</div>' : '';
+        const heroLabel = player.isHero ? '<span class="text-blue-300 ml-1">(Hero)</span>' : '';
+
+        playersHtml += `
+      <div class="player-seat seat-${player.position} ${isTurnClass} ${isActiveClass}">
+        ${dealerButtonHtml}
+        <div class="font-bold text-slate-200">${player.position} ${heroLabel}</div>
+        <div class="text-slate-400">${player.stackSize}</div>
+        <div class="hole-cards">${holeCardsHtml}</div>
+      </div>
+    `;
+
+        if (parseFloat(player.currentBet) > 0) {
+          betsHtml += `
+        <div class="bet-indicator bet-${player.position}">
+          ${generateChipStackHtml(player.currentBet)}
+          <span>${player.currentBet}</span>
+        </div>
+      `;
+        }
+      });
+
+      let communityCardsHtml = '';
+      if (!card.communityCards || card.communityCards.length === 0) {
+        communityCardsHtml = `<span style="color:rgba(255,255,255,0.3); font-size:1.5rem; font-weight:bold; letter-spacing: 2px;">PREFLOP</span>`;
+      } else {
+        communityCardsHtml = card.communityCards.map(parseCardHtml).join('');
+      }
 
       // 2. Build Categories & Draggables
       const categories = [...new Set(card.choices.map(c => c.targetCategory))];
-      let draggablesHtml = card.choices.map(c => 
+      let draggablesHtml = card.choices.map(c =>
         `<div draggable="true" data-target="${c.targetCategory}" class="cursor-grab active:cursor-grabbing p-3 bg-slate-700 rounded-lg shadow-lg border border-slate-500 text-center font-mono font-bold" ondragstart="dragStart(event)">${c.hand}</div>`
       ).join('');
 
       let dropzonesHtml = categories.map(cat => `
-        <div class="flex-1 flex flex-col">
-          <h3 class="text-center text-sm font-bold text-slate-400 mb-2">${cat}</h3>
-          <div data-cat="${cat}" class="dropzone flex-1 bg-slate-900/50 border-2 border-dashed border-slate-600 rounded-xl p-3 flex flex-col gap-2 min-h-[100px]" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
-        </div>
-      `).join('');
+    <div class="flex-1 flex flex-col">
+      <h3 class="text-center text-sm font-bold text-slate-400 mb-2">${cat}</h3>
+      <div data-cat="${cat}" class="dropzone flex-1 bg-slate-900/50 border-2 border-dashed border-slate-600 rounded-xl p-3 flex flex-col gap-2 min-h-[100px]" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
+    </div>
+  `).join('');
 
+      // 3. Inject DOM structure
       container.innerHTML = `
-        <div class="flex justify-between items-start mb-4">
-          <h2 class="text-lg font-bold text-white">${card.title} <span class="text-slate-400 text-sm font-normal ml-2">${card.phase}</span></h2>
-          <div class="text-right"><span class="text-sm text-slate-400">Pot:</span> <span class="font-bold text-yellow-400">${card.pot}</span></div>
-        </div>
-        <p class="text-sm text-slate-300 mb-6">${card.displayText}</p>
-        
-        <div class="poker-table w-full rounded-[3rem] p-6 mb-8 border-4 border-slate-700 shadow-inner grid grid-cols-3 gap-4 items-center justify-center">
-          ${positionsHtml}
-        </div>
+    <div class="flex justify-between items-start mb-4">
+      <h2 class="text-xl font-bold text-white">${card.title}</h2>
+      <div class="text-right bg-slate-900 px-4 py-2 rounded-lg border border-slate-700 shadow-inner">
+        <span class="text-sm text-slate-400">Pot:</span> 
+        <span class="font-bold text-yellow-400 ml-2">${card.pot}</span>
+      </div>
+    </div>
+    <p class="text-slate-300 mb-4">${card.displayText}</p>
+    
+    <div class="poker-table-area">
+      <div class="community-cards">
+        ${communityCardsHtml}
+      </div>
+      ${playersHtml}
+      ${betsHtml}
+    </div>
 
-        <div id="source-zone" class="flex justify-center gap-3 mb-6 min-h-[60px]" ondragover="dragOver(event)" ondrop="dropSource(event)">
-          ${draggablesHtml}
-        </div>
+    <div id="source-zone" class="flex justify-center gap-3 mb-6 min-h-[60px]" ondragover="dragOver(event)" ondrop="dropSource(event)">
+      ${draggablesHtml}
+    </div>
 
-        <div class="flex gap-4 w-full">${dropzonesHtml}</div>
-        <button id="dd-next" class="hidden mt-8 w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold transition-colors">Next Hand</button>
-      `;
+    <div class="flex gap-4 w-full">${dropzonesHtml}</div>
+    <button id="dd-next" class="hidden mt-8 w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold transition-colors">Next Hand</button>
+  `;
 
       container.dataset.totalItems = card.choices.length;
       container.dataset.correctItems = 0;
     }
-
     // --- DRAG AND DROP HANDLERS ---
     let draggedElement = null;
 
@@ -330,13 +626,13 @@
     function dragOver(e) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
-      if(e.currentTarget.classList.contains('dropzone')) {
+      if (e.currentTarget.classList.contains('dropzone')) {
         e.currentTarget.classList.add('drag-active');
       }
     }
 
     function dragLeave(e) {
-      if(e.currentTarget.classList.contains('dropzone')) {
+      if (e.currentTarget.classList.contains('dropzone')) {
         e.currentTarget.classList.remove('drag-active');
       }
     }
@@ -378,14 +674,14 @@
     function checkDragCompletion() {
       const container = document.getElementById('card-container');
       const total = parseInt(container.dataset.totalItems);
-      
+
       // Count items that are in dropzones and are correct
       const allDraggables = Array.from(container.querySelectorAll('[draggable="true"]'));
       const inDropzones = allDraggables.filter(el => el.parentElement.classList.contains('dropzone'));
       const allCorrect = allDraggables.every(el => el.dataset.correct === "true" && el.parentElement.classList.contains('dropzone'));
 
       const nextBtn = document.getElementById('dd-next');
-      
+
       if (inDropzones.length === total) {
         nextBtn.classList.remove('hidden');
         // If all are perfectly correct on first try, mark well. Otherwise OK or Badly depending on logic.
@@ -400,4 +696,5 @@
     document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
+
 </html>
