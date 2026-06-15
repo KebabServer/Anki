@@ -168,5 +168,38 @@
          {"hand": "AdTd", "targetCategory": "Min-Raise"},
          {"hand": "Ac5c", "targetCategory": "Min-Raise"}
         ]
+      },
+  {
+        "nodeId": "Facing_4Bet_OOP_006",
+        "title": "Facing 4Bet OOP",
+        "pot": "47.0 BB",
+        "communityCards": ["Jh", "5h", "8d"],
+        "quizType": "poker_drag",
+        "displayText": "",
+        "players": [
+          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": false, "isTurn": false, "stackSize": "95.2 BB", "currentBet": "0.00 BB"},
+          {"position": "BTN", "isActive": true, "isTurn": false, "stackSize": "101.57 BB", "currentBet": "13.55 BB"},
+          {"position": "SB", "isActive": true, "isTurn": true, "stackSize": "77.0 BB", "currentBet": "0.00 BB", "isHero": true},
+          {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
+        ],
+        "choices": [
+         {"hand": "Td9d", "targetCategory": "Raise All In"},
+         {"hand": "Kh6h", "targetCategory": "Raise All In"},
+         {"hand": "7s6s", "targetCategory": "Raise All In"},
+         {"hand": "QcJc", "targetCategory": "Raise All In"},
+         {"hand": "AcJd", "targetCategory": "Min-Raise"},
+         {"hand": "KcJd", "targetCategory": "Min-Raise"},
+         {"hand": "5d5c", "targetCategory": "Min-Raise"},
+         {"hand": "8s8h", "targetCategory": "Min-Raise"},
+         {"hand": "AhAs", "targetCategory": "Min-Raise"},
+         {"hand": "AdTd", "targetCategory": "Min-Raise"},
+         {"hand": "KdTd", "targetCategory": "Min-Raise"},
+         {"hand": "JcJd", "targetCategory": "Min-Raise"},
+         {"hand": "9c9d", "targetCategory": "Min-Raise"},
+         {"hand": "ThTd", "targetCategory": "Min-Raise"},
+         {"hand": "6d5d", "targetCategory": "Min-Raise"}
+        ]
       }
  ]
