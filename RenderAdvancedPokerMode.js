@@ -21,7 +21,7 @@ function renderAdvancedPokerMode(card, container) {
     playersHtml += `
       <div class="player-seat seat-${player.position} ${isTurnClass} ${isActiveClass}">
         ${dealerButtonHtml}
-        <div class="player-position-label">${player.position}${heroLabel}</div>
+        <div class="player-position">${player.position}${heroLabel}</div>
         <div class="player-stack">${player.stackSize}</div>
         <div class="hole-cards">${holeCardsHtml}</div>
       </div>
@@ -39,7 +39,7 @@ function renderAdvancedPokerMode(card, container) {
 
   let communityCardsHtml = '';
   if (!card.communityCards || card.communityCards.length === 0) {
-    communityCardsHtml = `<span class="preflop-badge">PREFLOP RUNTIME</span>`;
+    communityCardsHtml = `<span class="preflop-runtime-badge">PREFLOP RUNTIME</span>`;
   } else {
     communityCardsHtml = card.communityCards.map(parseCardHtml).join('');
   }
@@ -58,12 +58,13 @@ function renderAdvancedPokerMode(card, container) {
       const s = suit.toLowerCase();
       const suitSymbols = { 'h': '♥', 'd': '♦', 'c': '♣', 's': '♠' };
       
-      let suitClass = 'suit-spade';
-      if (s === 'h') suitClass = 'suit-heart';
-      if (s === 'd') suitClass = 'suit-diamond';
-      if (s === 'c') suitClass = 'suit-club';
+      // 4-Color system colors calibrated for high contrast over dark slate tokens
+      let color = '#f1f5f9';            // Spades = White/Slate
+      if (s === 'h') color = '#ef4444'; // Hearts = Red
+      if (s === 'd') color = '#60a5fa'; // Diamonds = Blue
+      if (s === 'c') color = '#4ade80'; // Clubs = Green
       
-      return `${val}<span class="card-suit ${suitClass}">${suitSymbols[s] || s}</span>`;
+      return `${val}<span style="color: ${color}; font-family: system-ui, sans-serif; margin-left: 2px; margin-right: 2px; font-size: 1.1em;">${suitSymbols[s] || s}</span>`;
     });
 
     return `
@@ -75,25 +76,22 @@ function renderAdvancedPokerMode(card, container) {
 
   let dropzonesHtml = categories.map(cat => `
     <div class="dropzone-container">
-      <h3 class="dropzone-title">${cat}</h3>
+      <h3 class="dropzone-header">${cat}</h3>
       <div data-cat="${cat}" class="dropzone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
     </div>
   `).join('');
 
   container.innerHTML = `
     <style>
-      /* --- Layout Framework & Container --- */
-      .matrix-wrapper {
+      /* --- EXTRACTED TAILWIND STYLES --- */
+      .poker-wrapper {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         height: 100%;
         flex-grow: 1;
-        font-family: system-ui, -apple-system, sans-serif;
       }
-
-      /* Header Styling */
-      .matrix-header {
+      .header-container {
         display: flex;
         justify-content: space-between;
         align-items: start;
@@ -101,26 +99,23 @@ function renderAdvancedPokerMode(card, container) {
         padding-bottom: 0.5rem;
         margin-bottom: 0.75rem;
       }
-      .engine-badge {
+      .badge-engine {
         font-size: 10px;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         font-family: monospace;
         background-color: rgba(6, 78, 59, 0.6);
         border: 1px solid rgba(4, 120, 87, 0.4);
-        color: #6ee7b7;
+        color: #10b981;
         padding: 0.125rem 0.5rem;
-        border-radius: 4px;
+        border-radius: 0.25rem;
       }
-      .matrix-title {
+      .header-title {
         font-size: 0.875rem;
-        font-weight: bold;
+        font-weight: 700;
         color: #ffffff;
         margin-top: 0.375rem;
-        margin-bottom: 0;
       }
-
-      /* Compact Toggle Controls */
       .toggle-container {
         display: flex;
         align-items: center;
@@ -128,14 +123,15 @@ function renderAdvancedPokerMode(card, container) {
         background-color: rgba(15, 23, 42, 0.8);
         padding: 0.375rem 0.625rem;
         border: 1px solid rgba(51, 65, 85, 0.8);
-        border-radius: 8px;
-        font-size: 11px;
+        border-radius: 0.5rem;
         box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        font-size: 11px;
       }
-      .toggle-checkbox {
+      .toggle-input {
         width: 0.875rem;
         height: 0.875rem;
-        border-radius: 4px;
+        border-radius: 0.25rem;
+        color: #2563eb;
         background-color: #1e293b;
         border-color: #475569;
         cursor: pointer;
@@ -146,9 +142,7 @@ function renderAdvancedPokerMode(card, container) {
         cursor: pointer;
         user-select: none;
       }
-
-      /* Info Box */
-      .matrix-description {
+      .display-text {
         font-size: 0.75rem;
         color: #cbd5e1;
         margin-bottom: 0.75rem;
@@ -156,101 +150,73 @@ function renderAdvancedPokerMode(card, container) {
         background-color: rgba(15, 23, 42, 0.3);
         padding: 0.625rem;
         border: 1px solid rgba(51, 65, 85, 0.3);
-        border-radius: 8px;
+        border-radius: 0.5rem;
       }
-
-      /* Poker Table Area Layout */
-      .table-center-elements {
+      .center-board {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 0.5rem;
         z-index: 10;
       }
-      .preflop-badge {
+      .community-cards {
+        display: flex;
+        gap: 0.375rem;
+      }
+      .preflop-runtime-badge {
         color: rgba(148, 163, 184, 0.5);
         font-family: monospace;
         font-size: 0.75rem;
-        font-weight: bold;
-        letter-spacing: 0.05em;
+        font-weight: 700;
+        letter-spacing: 0.1em;
         border: 1px solid rgba(51, 65, 85, 0.4);
         padding: 0.375rem 1rem;
         background-color: rgba(15, 23, 42, 0.3);
-        border-radius: 6px;
+        border-radius: 0.375rem;
+      }
+      @media (min-width: 640px) {
+        .preflop-runtime-badge {
+          font-size: 0.875rem;
+        }
       }
       .pot-display {
         display: flex;
-        items-center: center;
+        align-items: center;
         justify-content: center;
         gap: 0.5rem;
         background-color: rgba(2, 6, 23, 0.8);
         font-size: 11px;
         border: 1px solid rgba(30, 41, 59, 0.8);
-        font-weight: bold;
-        color: #facc15;
+        font-weight: 700;
+        color: #eab308;
         padding: 0.125rem 0.625rem;
-        border-radius: 6px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-radius: 0.375rem;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         margin-top: 0.125rem;
       }
-
-      /* Player Elements */
+      @media (min-width: 640px) {
+        .pot-display {
+          font-size: 0.75rem;
+        }
+      }
+      .player-position {
+        font-weight: 700;
+        color: #cbd5e1;
+      }
       .hero-label {
         color: #60a5fa;
-        font-weight: bold;
+        font-weight: 700;
         margin-left: 0.125rem;
-      }
-      .player-position-label {
-        font-weight: bold;
-        color: #cbd5e1;
       }
       .player-stack {
         font-size: 10px;
-        color: #94a3b8;
+        color: #94a6b8;
         letter-spacing: -0.05em;
       }
-
-      /* Draggable Card Tokens */
-      .draggable-token {
-        cursor: grab;
-        padding: 0.625rem 1rem;
-        background-color: #334155;
-        color: #ffffff;
-        font-family: monospace;
-        font-weight: 900;
-        font-size: 0.875rem;
-        border-radius: 8px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        border: 1px solid #64748b;
-        text-align: center;
-        user-select: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        letter-spacing: 0.025em;
-        min-width: 70px;
-      }
-      .draggable-token:active {
-        cursor: grabbing;
-      }
-      .card-suit {
-        font-family: system-ui, sans-serif;
-        margin-left: 2px;
-        margin-right: 2px;
-        font-size: 1.1em;
-      }
-
-      /* Token 4-Color Deck Defaults */
-      .suit-spade { color: #f1f5f9; }
-      .suit-heart { color: #ef4444; }
-      .suit-diamond { color: #60a5fa; }
-      .suit-club { color: #4ade80; }
-
-      /* Zones Layout */
-      .source-zone-wrapper {
+      .source-zone-container {
         display: flex;
         justify-content: center;
-        flex-wrap: flex-wrap;
+        flex-wrap: wrap;
         gap: 0.75rem;
         margin-top: 1rem;
         margin-bottom: 1rem;
@@ -258,8 +224,36 @@ function renderAdvancedPokerMode(card, container) {
         align-items: center;
         background-color: rgba(15, 23, 42, 0.4);
         padding: 0.625rem;
-        border-radius: 12px;
+        border-radius: 0.75rem;
         border: 1px solid rgba(51, 65, 85, 0.4);
+      }
+      .draggable-token {
+        cursor: grab;
+        padding: 0.625rem 1rem;
+        background-color: #334155;
+        color: #ffffff;
+        font-family: monospace;
+        font-weight: 800;
+        font-size: 0.875rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border: 1px solid #64748b;
+        text-align: center;
+        vertical-align: middle;
+        user-select: none;
+        display: flex;
+        items-center: center;
+        justify-content: center;
+        letter-spacing: 0.025em;
+        min-width: 70px;
+      }
+      .draggable-token:active {
+        cursor: grabbing;
+      }
+      @media (min-width: 640px) {
+        .draggable-token {
+          font-size: 1rem;
+        }
       }
       .dropzones-wrapper {
         display: flex;
@@ -267,64 +261,54 @@ function renderAdvancedPokerMode(card, container) {
         width: 100%;
       }
       .dropzone-container {
-        flex: 1;
+        flex: 1 1 0%;
         display: flex;
         flex-direction: column;
         background-color: rgba(15, 23, 42, 0.2);
         border: 1px solid rgba(51, 65, 85, 0.5);
         padding: 0.625rem;
-        border-radius: 12px;
+        border-radius: 0.75rem;
       }
-      .dropzone-title {
+      .dropzone-header {
         text-align: center;
         font-size: 11px;
-        font-weight: bold;
-        color: #94a3b8;
+        font-weight: 700;
+        color: #94a6b8;
         letter-spacing: 0.025em;
         text-transform: uppercase;
-        margin-top: 0;
         margin-bottom: 0.375rem;
       }
       .dropzone {
-        flex: 1;
+        flex: 1 1 0%;
         background-color: rgba(15, 23, 42, 0.4);
         border: 1px dashed rgba(51, 65, 85, 0.8);
-        border-radius: 8px;
+        border-radius: 0.5rem;
         padding: 0.5rem;
         display: flex;
         flex-direction: column;
         gap: 0.375rem;
         min-height: 85px;
       }
-
-      /* Confirm Button */
-      .confirm-btn {
+      .btn-confirm {
         display: none;
         margin-top: 1.25rem;
         width: 100%;
-        padding: 0.75rem 0;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
         background-color: #2563eb;
-        border: none;
-        border-radius: 8px;
-        color: #ffffff;
+        border-radius: 0.5rem;
         font-size: 0.875rem;
-        font-weight: bold;
+        font-weight: 700;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        transition: background-color 0.2s;
-        cursor: pointer;
+        transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 150ms;
       }
-      .confirm-btn:hover {
+      .btn-confirm:hover {
         background-color: #3b82f6;
       }
 
-      /* Responsive Adjustments for Tokens */
-      @media (min-width: 640px) {
-        .preflop-badge { font-size: 0.875rem; }
-        .pot-display { font-size: 0.875rem; }
-        .draggable-token { font-size: 1rem; }
-      }
-
-      /* --- Base/Standard Community Card Framework styling --- */
+      /* --- BASE/STANDARD CORE STYLES --- */
       .community-cards > * {
         font-size: 1.25rem !important;
         font-weight: 800 !important;
@@ -360,26 +344,26 @@ function renderAdvancedPokerMode(card, container) {
       }
     </style>
 
-    <div class="matrix-wrapper">
+    <div class="poker-wrapper">
       <div>
-        <div class="matrix-header">
+        <div class="header-container">
           <div>
-            <span class="engine-badge">Poker Matrix Engine</span>
-            <h2 class="matrix-title">${card.title || 'Game Matrix Checkpoint'}</h2>
+            <span class="badge-engine">Poker Matrix Engine</span>
+            <h2 class="header-title">${card.title || 'Game Matrix Checkpoint'}</h2>
           </div>
           
           <div class="toggle-container">
-            <input type="checkbox" id="compact-toggle" ${isCompactMode ? 'checked' : ''} class="toggle-checkbox">
+            <input type="checkbox" id="compact-toggle" ${isCompactMode ? 'checked' : ''} class="toggle-input">
             <label for="compact-toggle" class="toggle-label">Compact Engine Table</label>
           </div>
         </div>
         
-        <p class="matrix-description">${card.displayText}</p>
+        <p class="display-text">${card.displayText}</p>
         
         <div class="poker-table-area ${isCompactMode ? 'compact' : ''}">
           
-          <div class="table-center-elements">
-            <div class="community-cards" style="display: flex; gap: 0.375rem;">${communityCardsHtml}</div>
+          <div class="center-board">
+            <div class="community-cards">${communityCardsHtml}</div>
             
             <div class="pot-display">
               ${generateChipStackHtml(card.pot)}
@@ -391,32 +375,41 @@ function renderAdvancedPokerMode(card, container) {
           ${betsHtml}
         </div>
 
-        <div id="source-zone" class="source-zone-wrapper">
+        <div id="source-zone" class="source-zone-container">
           ${draggablesHtml}
         </div>
 
         <div class="dropzones-wrapper">${dropzonesHtml}</div>
       </div>
       
-      <button id="dd-next" class="confirm-btn">Confirm Strategic Configuration</button>
+      <button id="dd-next" class="btn-confirm">Confirm Strategic Configuration</button>
     </div>
   `;
 
-  // 3. POST-RENDER PROCESSOR: Enforce 4-Color Logic on Board & Player Hole Cards via Native CSS Engine Colors
+  // 3. POST-RENDER PROCESSOR: Enforce 4-Color Logic on Board & Player Hole Cards
   container.querySelectorAll('.community-cards > *, .hole-cards > *').forEach(cardEl => {
     const structuralText = cardEl.textContent || cardEl.innerHTML;
     
-    let targetColor = '#1e293b'; // Spades -> Slate/Dark Gray Default
+    // Diamonds -> Blue
     if (structuralText.includes('♦') || structuralText.includes('d')) {
-      targetColor = '#2563eb'; // Diamonds -> Blue
-    } else if (structuralText.includes('♣') || structuralText.includes('c')) {
-      targetColor = '#16a34a'; // Clubs -> Green
-    } else if (structuralText.includes('♥') || structuralText.includes('h')) {
-      targetColor = '#dc2626'; // Hearts -> Red
+      cardEl.style.setProperty('color', '#2563eb', 'important');
+      cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#2563eb', 'important'));
     }
-
-    cardEl.style.setProperty('color', targetColor, 'important');
-    cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', targetColor, 'important'));
+    // Clubs -> Green
+    else if (structuralText.includes('♣') || structuralText.includes('c')) {
+      cardEl.style.setProperty('color', '#16a34a', 'important');
+      cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#16a34a', 'important'));
+    }
+    // Hearts -> Red
+    else if (structuralText.includes('♥') || structuralText.includes('h')) {
+      cardEl.style.setProperty('color', '#dc2626', 'important');
+      cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#dc2626', 'important'));
+    }
+    // Spades -> Black
+    else if (structuralText.includes('♠') || structuralText.includes('s')) {
+      cardEl.style.setProperty('color', '#1e293b', 'important');
+      cardEl.querySelectorAll('*').forEach(c => c.style.setProperty('color', '#1e293b', 'important'));
+    }
   });
 
   // Toggle Listener Controls
