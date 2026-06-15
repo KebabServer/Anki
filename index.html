@@ -157,6 +157,53 @@
         ]
       }
     ];
+    // --- UTILITY CONTROLS EXTENSION INITIALIZATION ---
+function initEngineUtilities(deckData, activeIndexCallback) {
+  const selector = document.getElementById('quiz-selector');
+  const resetBtn = document.getElementById('reset-memory-btn');
+
+  // 1. Populate Dropdown Options Dynamically
+  if (selector && Array.isArray(deckData)) {
+    selector.innerHTML = deckData.map((card, idx) => {
+      // Create a clean readable label string for options
+      const typeLabel = card.quizType ? `[${card.quizType.toUpperCase()}]` : '[QUIZ]';
+      const summaryText = card.question || card.title || card.displayText || `Item ${idx + 1}`;
+      const truncatedSummary = summaryText.length > 45 ? summaryText.substring(0, 45) + '...' : summaryText;
+      
+      return `<option value="${idx}">${typeLabel} ${truncatedSummary}</option>`;
+    }).join('');
+
+    // Update selector value to sync with runtime mutations
+    selector.value = currentCardIndex;
+
+    // Handle user manual dropdown navigation selection change
+    selector.addEventListener('change', (e) => {
+      const selectedIdx = parseInt(e.target.value, 10);
+      currentCardIndex = selectedIdx;
+      
+      // Fires your template renderer function (adjust naming hook if different)
+      if (typeof renderCurrentCard === 'function') {
+        renderCurrentCard();
+      } else if (typeof activeIndexCallback === 'function') {
+        activeIndexCallback(selectedIdx);
+      }
+    });
+  }
+
+  // 2. Destructive Memory Clear Implementation with Prompt Guardrail
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      const configurationConfirmed = confirm(
+        "Are you absolutely sure you want to reset your engine memory?\n\nThis will permanently wipe all local storage quiz logs, tracking metrics, and historical card mastery rankings. This operation cannot be undone."
+      );
+      
+      if (configurationConfirmed) {
+        localStorage.removeItem('flashcard_engine_stats');
+        window.location.reload(); // Hard refresh to reset UI states completely
+      }
+    });
+  }
+}
 
     // --- APPLICATION CORE RUNTIME ARCHITECTURE ---
     let deck = [];
