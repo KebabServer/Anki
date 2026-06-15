@@ -66,15 +66,9 @@
   </div>
 
   <script>
-    // --- SECURITY & PROTECTION UTILITIES ---
     function escapeHtml(string) {
       if (!string) return '';
       return String(string)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
     }
 
     // --- INTEGRATED SUIT MAP & RENDER LOGIC ---
