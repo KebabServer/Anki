@@ -12,6 +12,12 @@
     "answer": "Your cold call range has flopped multiple sets.\n Your opponent is likely check back (AK combos have missed the board)\n Your hand class has a clear answer vs raise\n Don't lead/fold lots of equity hands\n Don't lead complete trash"   
   },
   {
+    "nodeId": "Facing_4Bet_OOP_Splitting_Raise_Ranges ",
+    "quizType": "anki",
+    "question": "Facing 4Bet OOP: Splitting X/R Ranges into Small/Big Sizes. How to do it?",
+    "answer": "Even at low SPRs, OOP should have a raising range vs small (likely range) cbets \n"   
+  },
+  {
         "nodeId": "Facing_4Bet_OOP_001",
         "title": "Facing 4Bet OOP",
         "pot": "50.00 BB",
