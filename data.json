@@ -143,5 +143,29 @@
           {"hand": "Td9d", "targetCategory": "Min-Raise"},
           {"hand": "JsTs", "targetCategory": "Min-Raise"}
         ]
+      },
+  {
+        "nodeId": "Facing_4Bet_OOP_006",
+        "title": "Facing 4Bet OOP",
+        "pot": "50.0 BB",
+        "communityCards": ["3h", "4d", "Qh"],
+        "quizType": "poker_drag",
+        "displayText": "",
+        "players": [
+          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": false, "isTurn": false, "stackSize": "95.2 BB", "currentBet": "0.00 BB"},
+          {"position": "BTN", "isActive": true, "isTurn": false, "stackSize": "97.88 BB", "currentBet": "10.00 BB"},
+          {"position": "SB", "isActive": true, "isTurn": true, "stackSize": "78.42 BB", "currentBet": "0.00 BB", "isHero": true},
+          {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
+        ],
+        "choices": [
+         {"hand": "Jh9h", "targetCategory": "Raise All In"},
+          {"hand": "QsJs", "targetCategory": "Raise All In"},
+          {"hand": "AcQc", "targetCategory": "Min-Raise"},
+          {"hand": "KcQc", "targetCategory": "Min-Raise"},
+          {"hand": "KdJd", "targetCategory": "Min-Raise"},
+          {"hand": "AdTd", "targetCategory": "Min-Raise"}
+        ]
       }
  ]
