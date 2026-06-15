@@ -27,8 +27,8 @@
     
     /* Community cards are now smaller by default */
     .card {
-      width: 22px;          /* Decreased from 26px */
-      height: 30px;         /* Decreased from 36px */
+      width: 22px;         
+      height: 30px;        
       background: white;
       border-radius: 3px;
       display: flex;
@@ -36,7 +36,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 11px;      /* Text size remains unchanged */
+      font-size: 11px;    
       box-shadow: 0 3px 5px rgba(0,0,0,0.3);
       line-height: 1.1;
       user-select: none;
@@ -91,7 +91,7 @@
       align-items: center;
       font-weight: 700;
       color: #f1f5f9;
-      z-index: 30; /* Heightened layer to sit elegantly atop seats and cards */
+      z-index: 30; 
       background: rgba(15, 23, 42, 0.85);
       border-radius: 6px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -135,11 +135,11 @@
 
     /* Adjusted Compact Bet Positions to avoid overlapping center cards */
     .poker-table-area .bet-UTG  { top: 40%; left: 90px; transform: translateY(-50%); }
-    .poker-table-area .bet-HJ   { top: 42px; left: 29%; }    /* Shifted up away from center */
-    .poker-table-area .bet-CO   { top: 42px; right: 29%; }   /* Shifted up away from center */
+    .poker-table-area .bet-HJ   { top: 42px; left: 29%; }    
+    .poker-table-area .bet-CO   { top: 42px; right: 29%; }  
     .poker-table-area .bet-BTN  { top: 40%; right: 90px; transform: translateY(-50%); }
-    .poker-table-area .bet-SB   { bottom: 54px; right: 29%; } /* Shifted down away from center */
-    .poker-table-area .bet-BB   { bottom: 54px; left: 29%; }  /* Shifted down away from center */
+    .poker-table-area .bet-SB   { bottom: 54px; right: 29%; } 
+    .poker-table-area .bet-BB   { bottom: 54px; left: 29%; }
 
     /* --- CONTENT BOX TYPOGRAPHY RENDERING --- */
     #html-answer-target h1, 
