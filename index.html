@@ -159,93 +159,95 @@
         ]
       }
     ];
+
     // --- UTILITY CONTROLS EXTENSION INITIALIZATION ---
-function initEngineUtilities(deckData, activeIndexCallback) {
-  const selector = document.getElementById('quiz-selector');
-  const resetBtn = document.getElementById('reset-memory-btn');
+    function initEngineUtilities(deckData, activeIndexCallback) {
+      const selector = document.getElementById('quiz-selector');
+      const resetBtn = document.getElementById('reset-memory-btn');
 
-  // 1. Populate Dropdown Options Dynamically
-  if (selector && Array.isArray(deckData)) {
-    selector.innerHTML = deckData.map((card, idx) => {
-      // Create a clean readable label string for options
-      const typeLabel = card.quizType ? `[${card.quizType.toUpperCase()}]` : '[QUIZ]';
-      const summaryText = card.question || card.title || card.displayText || `Item ${idx + 1}`;
-      const truncatedSummary = summaryText.length > 45 ? summaryText.substring(0, 45) + '...' : summaryText;
-      
-      return `<option value="${idx}">${typeLabel} ${truncatedSummary}</option>`;
-    }).join('');
+      // 1. Populate Dropdown Options Dynamically
+      if (selector && Array.isArray(deckData)) {
+        selector.innerHTML = deckData.map((card, idx) => {
+          const typeLabel = card.quizType ? `[${card.quizType.toUpperCase()}]` : '[QUIZ]';
+          const summaryText = card.question || card.title || card.displayText || `Item ${idx + 1}`;
+          const truncatedSummary = summaryText.length > 45 ? summaryText.substring(0, 45) + '...' : summaryText;
+          
+          return `<option value="${idx}">${typeLabel} ${truncatedSummary}</option>`;
+        }).join('');
 
-    // Update selector value to sync with runtime mutations
-    selector.value = currentCardIndex;
+        // Sync selector value with runtime state
+        selector.value = currentCardIndex;
 
-    // Handle user manual dropdown navigation selection change
-    selector.addEventListener('change', (e) => {
-      const selectedIdx = parseInt(e.target.value, 10);
-      currentCardIndex = selectedIdx;
-      
-      // Fires your template renderer function (adjust naming hook if different)
-      if (typeof renderCurrentCard === 'function') {
-        renderCurrentCard();
-      } else if (typeof activeIndexCallback === 'function') {
-        activeIndexCallback(selectedIdx);
+        // Handle user manual dropdown navigation selection change
+        selector.addEventListener('change', (e) => {
+          const selectedIdx = parseInt(e.target.value, 10);
+          currentCardIndex = selectedIdx;
+          
+          const container = document.getElementById('card-container');
+          currentCard = deck[currentCardIndex];
+          
+          if (currentCard && container) {
+            renderCardRouter(currentCard, container);
+          }
+          
+          if (typeof activeIndexCallback === 'function') {
+            activeIndexCallback(selectedIdx);
+          }
+        });
       }
-    });
-  }
 
-  // 2. Destructive Memory Clear Implementation with Prompt Guardrail
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      const configurationConfirmed = confirm(
-        "Are you absolutely sure you want to reset your engine memory?\n\nThis will permanently wipe all local storage quiz logs, tracking metrics, and historical card mastery rankings. This operation cannot be undone."
-      );
-      
-      if (configurationConfirmed) {
-        localStorage.removeItem('flashcard_engine_stats');
-        window.location.reload(); // Hard refresh to reset UI states completely
+      // 2. Memory Clear Implementation
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          const configurationConfirmed = confirm(
+            "Are you absolutely sure you want to reset your engine memory?\n\nThis will permanently wipe all local storage quiz logs, tracking metrics, and historical card mastery rankings. This operation cannot be undone."
+          );
+          
+          if (configurationConfirmed) {
+            localStorage.removeItem('flashcard_engine_stats');
+            window.location.reload();
+          }
+        });
       }
-    });
-  }
-}
+    }
 
     // --- APPLICATION CORE RUNTIME ARCHITECTURE ---
     let deck = [];
     let sessionQueue = [];
     let currentCard = null;
+    let currentCardIndex = 0; // Fixed: Global tracking initialization variable
     let stats = JSON.parse(localStorage.getItem('flashcard_engine_stats')) || {};
-    let isCompactMode = true; // Global layout toggle configuration state
+    let isCompactMode = true; 
 
     let sessionTotal = 0;
     let sessionCompleted = 0;
     let draggedElement = null;
 
-   async function init() {
-  try {
-    const response = await fetch('data.json');
-    if (!response.ok) throw new Error('Network configuration lookup error.');
-    deck = await response.json();
-  } catch (error) {
-    console.warn('Could not cleanly load an external data.json resource. Falling back onto the embedded runtime repository.');
-    deck = fallbackDeck;
-  }
-  
-  // --- ADD THIS LINE TO FIX THE BUTTON & DROPDOWN ---
-  initEngineUtilities(deck); 
-  
-  // Filter algorithm out cards currently locked down as mastered status (Value: 2)
-  sessionQueue = deck.filter(card => !stats[card.nodeId] || stats[card.nodeId] < 2);
-  
-  if (sessionQueue.length === 0) {
-    // Recycle state parameters to ensure endless loops during evaluation
-    sessionQueue = [...deck];
-    stats = {};
-    localStorage.removeItem('flashcard_engine_stats');
-  }
+    async function init() {
+      try {
+        const response = await fetch('data.json');
+        if (!response.ok) throw new Error('Network configuration lookup error.');
+        deck = await response.json();
+      } catch (error) {
+        console.warn('Could not cleanly load an external data.json resource. Falling back onto the embedded runtime repository.');
+        deck = fallbackDeck;
+      }
+      
+      initEngineUtilities(deck); 
+      
+      sessionQueue = deck.filter(card => !stats[card.nodeId] || stats[card.nodeId] < 2);
+      
+      if (sessionQueue.length === 0) {
+        sessionQueue = [...deck];
+        stats = {};
+        localStorage.removeItem('flashcard_engine_stats');
+      }
 
-  sessionTotal = sessionQueue.length;
-  sessionCompleted = 0;
-  updateProgress();
-  nextCard();
-}
+      sessionTotal = sessionQueue.length;
+      sessionCompleted = 0;
+      updateProgress();
+      nextCard();
+    }
 
     function updateProgress() {
       document.getElementById('progress-text').innerText = `${sessionCompleted} / ${sessionTotal} Decks Evaluation`;
@@ -272,7 +274,7 @@ function initEngineUtilities(deckData, activeIndexCallback) {
     function nextCard() {
       const container = document.getElementById('card-container');
       container.classList.remove('fade-enter');
-      void container.offsetWidth; // Force hardware composition layout paint reflow
+      void container.offsetWidth; 
       container.classList.add('fade-enter');
 
       if (sessionQueue.length === 0) {
@@ -288,6 +290,12 @@ function initEngineUtilities(deckData, activeIndexCallback) {
       }
 
       currentCard = sessionQueue.shift();
+      
+      // Fixed: Keeps the dropdown selector matching the current card's row index context
+      currentCardIndex = deck.indexOf(currentCard);
+      const selector = document.getElementById('quiz-selector');
+      if (selector) selector.value = currentCardIndex;
+
       renderCardRouter(currentCard, container);
     }
 
@@ -304,39 +312,36 @@ function initEngineUtilities(deckData, activeIndexCallback) {
 
     // --- 1. MODE: STANDARD ANKI RATING FLASHCARD ---
     function renderAnkiMode(card, container) {
-  // 1. Build the base container frame structure
-  container.innerHTML = `
-    <div class="flex-grow flex flex-col justify-between h-full">
-      <div>
-        <span class="text-[10px] uppercase tracking-widest font-mono bg-blue-900/60 border border-blue-700/40 text-blue-300 px-2 py-0.5 rounded">Standard Flashcard</span>
-        <h2 class="text-lg font-medium text-white mt-4 leading-relaxed">${card.question}</h2>
-      </div>
-      
-      <div id="answer-area" class="hidden flex-col w-full mt-6 bg-slate-900/40 border border-slate-700/50 rounded-xl p-4">
-        <div id="html-answer-target" class="text-sm text-slate-300 leading-relaxed"></div>
-        
-        <div class="grid grid-cols-3 gap-3 mt-6">
-          <button onclick="handleCardComplete(0)" class="px-3 py-2 bg-red-950/40 hover:bg-red-900 text-red-200 text-xs font-semibold rounded-lg transition-all border border-red-800/40">Badly (Re-queue)</button>
-          <button onclick="handleCardComplete(1)" class="px-3 py-2 bg-yellow-950/40 hover:bg-yellow-900 text-yellow-200 text-xs font-semibold rounded-lg transition-all border border-yellow-800/40">OK (Keep Loop)</button>
-          <button onclick="handleCardComplete(2)" class="px-3 py-2 bg-green-950/40 hover:bg-green-900 text-green-200 text-xs font-semibold rounded-lg transition-all border border-green-800/40">Well (Mastered)</button>
+      container.innerHTML = `
+        <div class="flex-grow flex flex-col justify-between h-full">
+          <div>
+            <span class="text-[10px] uppercase tracking-widest font-mono bg-blue-900/60 border border-blue-700/40 text-blue-300 px-2 py-0.5 rounded">Standard Flashcard</span>
+            <h2 class="text-lg font-medium text-white mt-4 leading-relaxed">${card.question}</h2>
+          </div>
+          
+          <div id="answer-area" class="hidden flex-col w-full mt-6 bg-slate-900/40 border border-slate-700/50 rounded-xl p-4">
+            <div id="html-answer-target" class="text-sm text-slate-300 leading-relaxed"></div>
+            
+            <div class="grid grid-cols-3 gap-3 mt-6">
+              <button onclick="handleCardComplete(0)" class="px-3 py-2 bg-red-950/40 hover:bg-red-900 text-red-200 text-xs font-semibold rounded-lg transition-all border border-red-800/40">Badly (Re-queue)</button>
+              <button onclick="handleCardComplete(1)" class="px-3 py-2 bg-yellow-950/40 hover:bg-yellow-900 text-yellow-200 text-xs font-semibold rounded-lg transition-all border border-yellow-800/40">OK (Keep Loop)</button>
+              <button onclick="handleCardComplete(2)" class="px-3 py-2 bg-green-950/40 hover:bg-green-900 text-green-200 text-xs font-semibold rounded-lg transition-all border border-green-800/40">Well (Mastered)</button>
+            </div>
+          </div>
+          
+          <button id="show-btn" class="mt-8 w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold tracking-wide transition-colors shadow-lg shadow-blue-900/30">Show Answer Formulation</button>
         </div>
-      </div>
-      
-      <button id="show-btn" class="mt-8 w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold tracking-wide transition-colors shadow-lg shadow-blue-900/30">Show Answer Formulation</button>
-    </div>
-  `;
+      `;
 
-  // 2. Explicitly target the node and parse the raw HTML code from JSON
-  document.getElementById('html-answer-target').innerHTML = card.answer;
+      document.getElementById('html-answer-target').innerHTML = card.answer;
 
-  // 3. Keep your existing show-button logic intact
-  document.getElementById('show-btn').addEventListener('click', (e) => {
-    e.target.classList.add('hidden');
-    const ans = document.getElementById('answer-area');
-    ans.classList.remove('hidden');
-    ans.classList.add('flex');
-  });
-}
+      document.getElementById('show-btn').addEventListener('click', (e) => {
+        e.target.classList.add('hidden');
+        const ans = document.getElementById('answer-area');
+        ans.classList.remove('hidden');
+        ans.classList.add('flex');
+      });
+    }
 
     // --- 2. MODE: MULTIPLE CHOICE OPTION PARSER ---
     function renderMultipleChoiceMode(card, container) {
@@ -359,145 +364,4 @@ function initEngineUtilities(deckData, activeIndexCallback) {
       btns.forEach(btn => {
         btn.addEventListener('click', (e) => {
           const currentTarget = e.currentTarget;
-          if (container.querySelector('.pointer-events-none')) return; // Thread locks double interaction
-          
-          btns.forEach(b => b.classList.add('pointer-events-none', 'opacity-40'));
-          const selectedIdx = parseInt(currentTarget.dataset.idx);
-          const isCorrect = selectedIdx === card.correctIndex;
-          
-          currentTarget.classList.remove('bg-slate-700/60', 'hover:bg-slate-700', 'opacity-40');
-          if (isCorrect) {
-            currentTarget.classList.add('bg-green-900/50', 'border-green-500', 'ring-1', 'ring-green-400');
-          } else {
-            currentTarget.classList.add('bg-red-900/50', 'border-red-500', 'ring-1', 'ring-red-400');
-            btns[card.correctIndex].classList.remove('opacity-40');
-            btns[card.correctIndex].classList.add('bg-green-900/30', 'border-green-600/80');
-          }
-
-          const nextBtn = document.getElementById('mc-next');
-          nextBtn.classList.remove('hidden');
-          nextBtn.onclick = () => handleCardComplete(isCorrect ? 2 : 0);
-        });
-      });
-    }
-
-    // --- 3. MODE: STANDARD CATEGORICAL DRAG & DROP ---
-    function renderStandardDragDropMode(card, container) {
-      const categories = [...new Set(card.choices.map(c => c.targetCategory))];
-      
-      let draggablesHtml = card.choices.map((c, i) => 
-        `<div draggable="true" data-target="${c.targetCategory}" id="dd-item-${i}" class="cursor-grab active:cursor-grabbing px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-100 font-medium text-xs rounded-lg shadow-md border border-slate-600 text-center transition-transform transform active:scale-95" ondragstart="dragStart(event)">${c.text}</div>`
-      ).join('');
-
-      let dropzonesHtml = categories.map(cat => `
-        <div class="flex-1 flex flex-col bg-slate-900/30 border border-slate-700/60 p-3 rounded-xl min-w-[200px]">
-          <h3 class="text-center text-xs font-bold text-slate-400 tracking-wider uppercase mb-2 border-b border-slate-700 pb-1.5">${cat}</h3>
-          <div data-cat="${cat}" class="dropzone flex-1 bg-slate-800/40 border-2 border-dashed border-slate-700/70 rounded-lg p-2.5 flex flex-col gap-2 min-h-[140px] transition-all" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropToMatch(event)"></div>
-        </div>
-      `).join('');
-
-      container.innerHTML = `
-        <div class="flex flex-col justify-between h-full flex-grow">
-          <div>
-            <span class="text-[10px] uppercase tracking-widest font-mono bg-purple-900/60 border border-purple-700/40 text-purple-300 px-2 py-0.5 rounded">Categorized Sorting</span>
-            <h2 class="text-base font-medium text-slate-200 mt-3 mb-4 leading-relaxed">${card.question}</h2>
-            
-            <div id="source-zone" class="flex flex-wrap gap-2.5 mb-6 p-3 bg-slate-900/50 border border-slate-700/60 rounded-xl min-h-[65px] items-center" ondragover="dragOver(event)" ondrop="dropSource(event)">
-              ${draggablesHtml}
-            </div>
-            
-            <div class="flex flex-wrap gap-4 w-full">${dropzonesHtml}</div>
-          </div>
-          <button id="dd-next" class="hidden mt-6 w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition-all">Submit Classifications</button>
-        </div>
-      `;
-
-      container.dataset.totalItems = card.choices.length;
-    }
-
-   // --- 4. MODE: ADVANCED POKER STRATEGY MATRIX (ENHANCED CARD TEXT SIZE & SHUFFLE) ---
-     
-    // --- SHARED DRAG AND DROP RUNTIME INTERACTION HANDLERS ---
-    function dragStart(e) {
-      draggedElement = e.target;
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', e.target.id);
-      setTimeout(() => e.target.classList.add('opacity-40'), 0);
-    }
-
-    function dragOver(e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      const zone = e.currentTarget;
-      if (zone.classList.contains('dropzone')) {
-        zone.classList.add('drag-active');
-      }
-    }
-
-    function dragLeave(e) {
-      const zone = e.currentTarget;
-      if (zone.classList.contains('dropzone')) {
-        zone.classList.remove('drag-active');
-      }
-    }
-
-    function dropSource(e) {
-      e.preventDefault();
-      if (!draggedElement) return;
-      draggedElement.classList.remove('opacity-40');
-      
-      // Strip score validation wrappers completely
-      draggedElement.classList.remove('bg-green-600', 'border-green-500', 'bg-red-600', 'border-red-500', 'bg-emerald-600', 'border-emerald-500');
-      draggedElement.classList.add('bg-slate-700', 'border-slate-500');
-      
-      document.getElementById('source-zone').appendChild(draggedElement);
-      checkDragAndDropCompletionState();
-    }
-
-    function dropToMatch(e) {
-      e.preventDefault();
-      const zone = e.currentTarget;
-      zone.classList.remove('drag-active');
-      if (!draggedElement) return;
-      draggedElement.classList.remove('opacity-40');
-
-      const expectedCategory = draggedElement.getAttribute('data-target');
-      const dropContainerCategory = zone.getAttribute('data-cat');
-
-      zone.appendChild(draggedElement);
-      draggedElement.classList.remove('bg-slate-700', 'border-slate-500', 'bg-slate-600');
-
-      if (expectedCategory === dropContainerCategory) {
-        draggedElement.classList.add('bg-green-600', 'border-green-500');
-        draggedElement.dataset.correct = "true";
-      } else {
-        draggedElement.classList.add('bg-red-600', 'border-red-500');
-        draggedElement.dataset.correct = "false";
-      }
-
-      checkDragAndDropCompletionState();
-    }
-
-    function checkDragAndDropCompletionState() {
-      const container = document.getElementById('card-container');
-      const expectedTotal = parseInt(container.dataset.totalItems);
-      
-      const elementsInScope = Array.from(container.querySelectorAll('[draggable="true"]'));
-      const localizedDropzonesCount = elementsInScope.filter(el => el.parentElement.classList.contains('dropzone')).length;
-      const perfectScoreValidated = elementsInScope.every(el => el.dataset.correct === "true" && el.parentElement.classList.contains('dropzone'));
-
-      const nextActionBtn = document.getElementById('dd-next');
-      
-      if (localizedDropzonesCount === expectedTotal) {
-        nextActionBtn.classList.remove('hidden');
-        nextActionBtn.onclick = () => handleCardComplete(perfectScoreValidated ? 2 : 1);
-      } else {
-        nextActionBtn.classList.add('hidden');
-      }
-    }
-
-    // Synchronize event handlers to boot loop execution parameters
-    document.addEventListener('DOMContentLoaded', init);
-  </script>
-</body>
-</html>
+          if (container.querySelector('.pointer-events-
