@@ -563,7 +563,7 @@
 
       if (localizedDropzonesCount === expectedTotal) {
         nextActionBtn.classList.remove('hidden');
-        nextActionBtn.onclick = () => handleCardComplete(perfectScoreValidated ? 2 : 1);
+        nextActionBtn.onclick = () => handleCardComplete(perfectScoreValidated ? 2 : 0);
       } else {
         nextActionBtn.classList.add('hidden');
       }
