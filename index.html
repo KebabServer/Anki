@@ -344,7 +344,7 @@
     }
 
     // --- 4. MODE: ADVANCED POKER STRATEGY MATRIX (WITH EMBEDDED DYNAMIC TOGGLE) ---
-    // --- 4. MODE: ADVANCED POKER STRATEGY MATRIX (WITH CENTERED POT & CHIPS) ---
+   // --- 4. MODE: ADVANCED POKER STRATEGY MATRIX (WITH SUIT COLORS & SHUFFLED HANDS) ---
     function renderAdvancedPokerMode(card, container) {
       let playersHtml = '';
       let betsHtml = '';
@@ -391,9 +391,31 @@
       }
 
       const categories = [...new Set(card.choices.map(c => c.targetCategory))];
-      let draggablesHtml = card.choices.map((c, i) => 
-        `<div draggable="true" data-target="${c.targetCategory}" id="poker-item-${i}" class="cursor-grab active:cursor-grabbing px-3 py-2 bg-slate-700 text-white font-mono font-bold text-xs rounded-lg shadow-xl border border-slate-500 text-center select-none" ondragstart="dragStart(event)">${c.hand}</div>`
-      ).join('');
+
+      // 1. RANDOMIZE HAND ORDER: Perform a secure, non-biased array shuffle on the choices
+      const randomizedChoices = [...card.choices]
+        .map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value);
+
+      // 2. APPLY SUIT COLORS: Map over the shuffled hands and format text to rich HTML symbols
+      let draggablesHtml = randomizedChoices.map((c, i) => {
+        const formattedHand = c.hand.replace(/([2-9TJQKA10]+)([hdcs])/gi, (match, val, suit) => {
+          const s = suit.toLowerCase();
+          const suitSymbols = { 'h': '♥', 'd': '♦', 'c': '♣', 's': '♠' };
+          
+          // Use high-contrast colors optimized to look sharp on slate, green (correct), or red (incorrect) states
+          const color = (s === 'h' || s === 'd') ? '#f87171' : '#f1f5f9'; 
+          
+          return `${val}<span style="color: ${color}; font-family: system-ui, sans-serif; margin-left: 1px; margin-right: 2px;">${suitSymbols[s] || s}</span>`;
+        });
+
+        return `
+          <div draggable="true" data-target="${c.targetCategory}" id="poker-item-${i}" class="cursor-grab active:cursor-grabbing px-3 py-2 bg-slate-700 text-white font-mono font-bold text-xs rounded-lg shadow-xl border border-slate-500 text-center select-none flex items-center justify-center" ondragstart="dragStart(event)">
+            ${formattedHand}
+          </div>
+        `;
+      }).join('');
 
       let dropzonesHtml = categories.map(cat => `
         <div class="flex-1 flex flex-col bg-slate-900/20 border border-slate-700/50 p-2.5 rounded-xl">
@@ -457,7 +479,6 @@
 
       container.dataset.totalItems = card.choices.length;
     }
-
     // --- SHARED DRAG AND DROP RUNTIME INTERACTION HANDLERS ---
     function dragStart(e) {
       draggedElement = e.target;
