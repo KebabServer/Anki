@@ -90,7 +90,7 @@
           {"hand": "KcJc", "targetCategory": "Small raise"},
           {"hand": "AhJh", "targetCategory": "Small raise"},
          {"hand": "AhKd", "targetCategory": "Small raise"},
-          {"hand": "8c7c", "targetCategory": "Small raise"},
+          {"hand": "8c7c", "targetCategory": "Fold"},
          {"hand": "7h6h", "targetCategory": "Fold"},
          {"hand": "Tc9c", "targetCategory": "Fold"}
         ]
