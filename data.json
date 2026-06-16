@@ -3,7 +3,7 @@
     "nodeId": "Finding_River_Leads_OOP",
     "quizType": "anki",
     "question": "Finding Leads OOP with Strong Hands when your Opponent Lacks Bluffs",
-    "answer": "<h2>Consider Leading the River When</h2><ul><li>Villain has a non-polarized range that is SD heavy and significantly lacks air combos AND</li><li>Your hand is worth more than a check AND</li><li>Your range can support betting</li></ul> <p>SRP BvB: 2c3c4c xc 6d xc 6c CAN LEAD</p> <p>SRP MPvsBB: 8c6c9s D33 R50 C 3h B70 C 4c LEAD ALL IN </p> <p>4B BTNvsBB: Jd5h2c B20 C 3d B25 C 5s CANT LEAD</p>"
+    "answer": "<h2>Consider Leading the River When</h2><ul><li>Villain has a non-polarized range that is SD heavy and significantly lacks air combos AND</li><li>Your hand is worth more than a check AND</li><li>Your range can support betting</li></ul> <p>SRP BvB: 2c3c4c xc 6d xc 6c CAN LEAD</p> <p>SRP MPvsBB: 8c6c9s D33 R50 C 3h B70 C 4c LEAD ALL IN </p> <p>4B BTNvsBB: Jd5h2c B20 C 3d B25 C 5s CANT LEAD</p> <p>Do <b>NOT</b> use this play when opponent has a polar turn range containing many <b>non-SD bluffs</b> that will shove river when we check</p>"
   },
   {
     "nodeId": "Facing_4Bet_OOP_Splitting_Raise_Ranges",
