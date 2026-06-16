@@ -30,6 +30,12 @@
     "answer": "<h2>Some Rules</h2><ol><li>It does not matter how strong your hand is - your opponent needs to ahve enough bluff combos to make bluffcatchers a call</li><li>Player profiling is super important!</li><li>Always try to find the bluff combos in each spot yourself and ask how difficult they are to find</li><li>Always try to find the value combos as well - if there is a lot of value relative to bluffs, it's almost always a fold</li><li>If you see almost no value but also no bluffs, weight the fact that it's harder to find bluffs over the lack of value and lean towards folding</li><li>We all make mistakes - use them as lessons to improve</li><li>Always consider their value range relative to the properties of your hand, and determine if those properties help or hurt you</li></ol><p>Another good way to increase our blue-line is to find high-level folds in spots where most player would call down"
   },
   {
+    "nodeId": "Lesson_6_Exploitative_All_Ins",
+    "quizType": "anki",
+    "question": "Lesson_6_Exploitative Node-Locked All-Ins",
+    "answer": "<p>One of the fastest ways to increase your win-rate is by punishing the weaker regs and fish for their unbalanced ranges in common nodes</p> <h2>Criteria for Making These Plays</h2> <p>If you can <b>cap your opponent's ranges</b> given the fact they tend to take (or not take) certain actions; i.e. they play <b>pure</b> strategy with certain hand classes in spots where a <b>mixed</b> strategy wold be correct in theory</p>"
+  },
+  {
     "nodeId": "Lesson_21_Facing_4Bet_OOP_Splitting_Raise_Ranges",
     "quizType": "anki",
     "question": "Facing 4Bet OOP: Splitting X/R Ranges into Small/Big Sizes. How to do it?",
