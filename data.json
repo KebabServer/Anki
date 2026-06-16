@@ -36,6 +36,12 @@
     "answer": "<p>One of the fastest ways to increase your win-rate is by punishing the weaker regs and fish for their unbalanced ranges in common nodes</p> <h2>Criteria for Making These Plays</h2> <p>If you can <b>cap your opponent's ranges</b> given the fact they tend to take (or not take) certain actions; i.e. they play <b>pure</b> strategy with certain hand classes in spots where a <b>mixed</b> strategy wold be correct in theory</p>"
   },
   {
+    "nodeId": "Lesson_7_Three_High_EV_Lessons",
+    "quizType": "anki",
+    "question": "Three High-EV Lessons",
+    "answer": "<ol><li>1. Take advanrage of face up range chop pot spots</li> <ul><li><b>Don't</b> chop when they have <b>too many folds</b></li><li>Look for nodes where a particular opponent <b>doesn't slowplay enough OOP</b></li></ul> <li>Always take your fold equity <b>when you have a huge draw</b> and your opponent has a lot of potential folds<ul><li><b>Plan A:</b> Think \"How can i <b>win without showdown?</b>\"</li> <li><b>Plan B:</b> The draw coming in</li></ul></li><li>Don't be afraid to make heavy exploitative adjustments<ul><li><b>Pay attention</b> to showdowns; note <b>strong deviations</b> or tendencies</li></ul></li></ol>"
+  },
+  {
     "nodeId": "Lesson_21_Facing_4Bet_OOP_Splitting_Raise_Ranges",
     "quizType": "anki",
     "question": "Facing 4Bet OOP: Splitting X/R Ranges into Small/Big Sizes. How to do it?",
