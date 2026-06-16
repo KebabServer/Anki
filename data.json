@@ -1,30 +1,36 @@
  [
   {
-    "nodeId": "Finding_River_Leads_OOP",
+    "nodeId": "Lesson_1_Finding_River_Leads_OOP",
     "quizType": "anki",
     "question": "Finding Leads OOP with Strong Hands when your Opponent Lacks Bluffs",
     "answer": "<h2>Consider Leading the River When</h2><ul><li>Villain has a non-polarized range that is SD heavy and significantly lacks air combos AND</li><li>Your hand is worth more than a check AND</li><li>Your range can support betting</li></ul> <p>SRP BvB: 2c3c4c xc 6d xc 6c CAN LEAD</p> <p>SRP MPvsBB: 8c6c9s D33 R50 C 3h B70 C 4c LEAD ALL IN </p> <p>4B BTNvsBB: Jd5h2c B20 C 3d B25 C 5s CANT LEAD</p> <p>Do <b>NOT</b> use this play when opponent has a polar turn range containing many <b>non-SD bluffs</b> that will shove river when we check.</p>"
   },
   {
-    "nodeId": "Calling_vs_Polarization",
+    "nodeId": "Lesson_2_Calling_vs_Polarization",
     "quizType": "anki",
     "question": "Calling vs Polarization",
     "answer": "<h2>Vs Aggressive Polarization</h2><ul><li><b>FOLD</b> all of your <b>bluffcatchers vs weak/tight</b> regs - only find calls against aggressive regs and players who are capable of bluffing!</li><li>Against, players who x/R with proper aggression <b>sometimes</b> you should <b>x-back strong hands IP</b> that don't want to see a x/r and barrel.</li><li>First <b>consider what they are representing</b> - then try to call with hands that <b>block their value</b></li></ul><p>Most players will <b>NOT</b> be <b>balanced</b> when making large river nuts-or-nothing overbets.</p>"
   },
   {
-    "nodeId": "Expanding_XR_Range",
+    "nodeId": "Lesson_3_Expanding_XR_Range",
     "quizType": "anki",
     "question": "Expanding Your Bluff Check-Raises (vs players who C-bet or fold too much",
     "answer": "<p>More bluff check-raising a great exploit vs players who c-bet the flop with too weak of a range - even better if they overfold on later streets.</p> <h2>Things to Look For</h2> <p> Juice spots! Are they c-betting too much? Range betting boards they shouldn't?</p> <h3>Hand Qualities</h3> <ol><li>Make many better hands <b>fold<b></li><li>Interacts with the board such that you'll be able to <b>barrel equity-driven</b> on a lot of turns</li><li>Has the potential to turn or river a <b>value-bettable</b> hand <li><b>Blocks</b> villain's calling range (on the flop or on future streets)</li><li>"Difficult" bluffs - <b>the harder it is to find bluff</b> in a spot, <b>the higher-EV</b> your bluffs will be</li><li>"Good" spots - <b>you will get called</b>, but you can increase your chances by choosing your spots (and player profiles) well</li></li></ol>"
   },
   {
-    "nodeId": "Dont_Need_The_Nuts_To_Overbet",
+    "nodeId": "Lesson_4_Dont_Need_The_Nuts_To_Overbet",
     "quizType": "anki",
     "question": "You Don't Need the Nuts to Overbet (You Just Need theBest Hand)",
     "answer": "<p>A common misconception is that you can only overbet the strongest parts of your range for value - but really all you need is enough vs your opponent's range</p> <h2>Some Rules</h2> <ol><li>The more unbalanced the opponent, the thinner we can overbet</li> <li>The less you want to bluff a certain player, the thinner you want to value bet them</li> <li>This strategy really crushes fish and "non-believer" (stick!) regs</li> <li>The fewer value combos your opponent has that beat your hand, the larger and wider you can go for value</li> <li>The better you are at breaking down your opponent's range actualy range, the more of these spots you can find correctly</li> <li>Employing these plays vs other regs can really hurt their confidence and induce them to make more mistakes vs you in the future</li></ol>"
   },
   {
-    "nodeId": "Facing_4Bet_OOP_Splitting_Raise_Ranges",
+    "nodeId": "Lesson_5_The_Art_of_Folding",
+    "quizType": "anki",
+    "question": "The Art of Folding",
+    "answer": "<h2>Some Rules</h2><ol><li>It does not matter how strong your hand is - your opponent needs to ahve enough bluff combos to make bluffcatchers a call</li><li>Player profiling is super important!</li><li>Always try to find the bluff combos in each spot yourself and ask how difficult they are to find</li><li>Always try to find the value combos as well - if there is a lot of value relative to bluffs, it's almost always a fold</li><li>If you see almost no value but also no bluffs, weight the fact that it's harder to find bluffs over the lack of value and lean towards folding</li><li>We all make mistakes - use them as lessons to improve</li><li>Always consider their value range relative to the properties of your hand, and determine if those properties help or hurt you</li></ol><p>Another good way to increase our blue-line is to find high-level folds in spots where most player would call down"
+  },
+  {
+    "nodeId": "Lesson_21_Facing_4Bet_OOP_Splitting_Raise_Ranges",
     "quizType": "anki",
     "question": "Facing 4Bet OOP: Splitting X/R Ranges into Small/Big Sizes. How to do it?",
     "answer": "<p>Facing a 4Bet OOP is not a great node. Once we face a 4B we shift from a high-EV 3B spot to one where we just want to lose as little as possible.</p><h2>Donking</h2><p>Having a Donking Range Makes Sense When</p><ul><li>Your cold call range has flopped multiple sets</li><li>Your opponent is likely check back (AK combos have missed the board)</li><li>Your hand class has a clear answer vs raise<ul><li>Don't lead lots of equity hands</li><li>Don't lead complete trash</li></ul></li></ul><h2>Splitting X/R Ranges into Small/Big Sizes</h2><ul><li>Even at low SPRs, OOP should have a raising range vs small (likely range) cbets</li><li>First, define the bottom of your value bet range - then choose your bluffs<ul><li>Avoid hands that suffer vs shove</li></ul></li><li>Generally you want to have an all-in size and a small size <ul><li>All-in range should be draws that want to capitalize on their fold equity plus value hands that need protection</li></ul></li><li>You can almost always shove an 8-out draw or better</li></ul><h2>Make sure you play your range and NOT your specific hand vs regs</h2><ul><li>If the flop checks around and the turn is good for your opponent, don't get too excited with a big hand and leave your checking range unprotected<ul><li>Check shove highest equity draws</li><li>Slowplay your best value hands</li></ul></li></ul><h2>Try to identify spots where the pool doesn't understand their hand's equity vs a range with thin value raises</h2><ul><li>The wider your opponent's range, the better</li><li>The more sizing tell you can pick up, the better</li><li>The more loosely they call, the better</li><li>The more they cbet too weak a range, the better</li></ul>"   
