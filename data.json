@@ -18,6 +18,12 @@
     "answer": "<p>More bluff check-raising a great exploit vs players who c-bet the flop with too weak of a range - even better if they overfold on later streets.</p> <h2>Things to Look For</h2> <p> Juice spots! Are they c-betting too much? Range betting boards they shouldn't?</p> <h3>Hand Qualities</h3> <ol><li>Make many better hands <b>fold<b></li><li>Interacts with the board such that you'll be able to <b>barrel equity-driven</b> on a lot of turns</li><li>Has the potential to turn or river a <b>value-bettable</b> hand <li><b>Blocks</b> villain's calling range (on the flop or on future streets)</li><li>"Difficult" bluffs - <b>the harder it is to find bluff</b> in a spot, <b>the higher-EV</b> your bluffs will be</li><li>"Good" spots - <b>you will get called</b>, but you can increase your chances by choosing your spots (and player profiles) well</li></li></ol>"
   },
   {
+    "nodeId": "Dont_Need_The_Nuts_To_Overbet",
+    "quizType": "anki",
+    "question": "You Don't Need the Nuts to Overbet (You Just Need theBest Hand)",
+    "answer": "<p>A common misconception is that you can only overbet the strongest parts of your range for value - but really all you need is enough vs your opponent's range</p> <h2>Some Rules</h2> <ol><li>The more unbalanced the opponent, the thinner we can overbet</li> <li>The less you want to bluff a certain player, the thinner you want to value bet them</li> <li>This strategy really crushes fish and "non-believer" (stick!) regs</li> <li>The fewer value combos your opponent has that beat your hand, the larger and wider you can go for value</li> <li>The better you are at breaking down your opponent's range actualy range, the more of these spots you can find correctly</li> <li>Employing these plays vs other regs can really hurt their confidence and induce them to make more mistakes vs you in the future</li></ol>"
+  },
+  {
     "nodeId": "Facing_4Bet_OOP_Splitting_Raise_Ranges",
     "quizType": "anki",
     "question": "Facing 4Bet OOP: Splitting X/R Ranges into Small/Big Sizes. How to do it?",
