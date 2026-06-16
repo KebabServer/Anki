@@ -6,6 +6,12 @@
     "answer": "<h2>Consider Leading the River When</h2><ul><li>Villain has a non-polarized range that is SD heavy and significantly lacks air combos AND</li><li>Your hand is worth more than a check AND</li><li>Your range can support betting</li></ul> <p>SRP BvB: 2c3c4c xc 6d xc 6c CAN LEAD</p> <p>SRP MPvsBB: 8c6c9s D33 R50 C 3h B70 C 4c LEAD ALL IN </p> <p>4B BTNvsBB: Jd5h2c B20 C 3d B25 C 5s CANT LEAD</p> <p>Do <b>NOT</b> use this play when opponent has a polar turn range containing many <b>non-SD bluffs</b> that will shove river when we check</p>"
   },
   {
+    "nodeId": "Calling_vs_Polarization",
+    "quizType": "anki",
+    "question": "Calling vs Polarization",
+    "answer": "<h2>Vs Aggressive Polarization</h2><ul><li><b>FOLD</b> all of your <b>bluffcatchers vs weak/tight</b> regs - only find calls against aggressive regs and players who are capable of bluffing!</li><li>Against, players who x/R with proper aggression <b>sometimes</b> you should <b>x-back strong hands IP</b> that don't want to see a x/r and barrel.</li><li>First <b>consider what they are representing</b> - then try to call with hands that <b>block their value</b></li></ul>"
+  },
+  {
     "nodeId": "Facing_4Bet_OOP_Splitting_Raise_Ranges",
     "quizType": "anki",
     "question": "Facing 4Bet OOP: Splitting X/R Ranges into Small/Big Sizes. How to do it?",
