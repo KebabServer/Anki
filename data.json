@@ -1,5 +1,11 @@
  [
   {
+    "nodeId": "Alvin_Low_Stakes_Preflop_Adjustments",
+    "quizType": "anki",
+    "question": "Alvin's Low Stakes Preflop Adjustments",
+    "answer": "<ul><li>3Bet linearly or fold except from big blind (exception vs raise and a call with pocket pairs)</li><li>Only set mine against 3bets if you are willing to bluff when you miss</li><li>In mp snap fold 88 to early position raise</li><li>From any position snap fold JJ to early positon 4bet</li><li>EP and earlier open fold ATo and KJo</li><li>Isolate limpers tighter</li><li>Play really tight from the BB in multi-way pots, never go multiway with offsuite cards</li></ul>"
+  },
+  {
     "nodeId": "Lesson_1_Finding_River_Leads_OOP",
     "quizType": "anki",
     "question": "Finding Leads OOP with Strong Hands when your Opponent Lacks Bluffs",
