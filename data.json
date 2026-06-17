@@ -11,7 +11,7 @@
         "pot": "50.00 BB",
         "communityCards": ["9c","7c","Td"],
         "quizType": "poker_drag",
-        "displayText": "All 3 sets on this board and AK misses. We need to be donking on this board.",
+        "displayText": "4BPot SB vs BTN",
         "players": [
           {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
           {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
