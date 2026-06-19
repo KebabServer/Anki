@@ -42,6 +42,107 @@
     "answer": "<ol><li>1. Take advanrage of face up range chop pot spots</li> <ul><li><b>Don't</b> chop when they have <b>too many folds</b></li><li>Look for nodes where a particular opponent <b>doesn't slowplay enough OOP</b></li></ul> <li>Always take your fold equity <b>when you have a huge draw</b> and your opponent has a lot of potential folds<ul><li><b>Plan A:</b> Think \"How can i <b>win without showdown?</b>\"</li> <li><b>Plan B:</b> The draw coming in</li></ul></li><li>Don't be afraid to make heavy exploitative adjustments<ul><li><b>Pay attention</b> to showdowns; note <b>strong deviations</b> or tendencies</li></ul></li></ol>"
   },
   {
+    "nodeId": "Lesson_8_Finding_a_Raise_in_Call_Spots",
+    "quizType": "anki",
+    "question": "Finding a Raise in -EV or 0EV Call Spots",
+    "answer": "<h2>Some Rules</h2><ol><li>You need to clearly see many value combos that your opponent will bet/fold</li><li>You want to see as many bluffs in their range as possible</li><li>Your line should be credible as a value line</li><li>Always \"inverser the spot\" mentally to explicitly check how much credibility/fold equity the line would have on you</li></ol>"
+  },
+  {
+    "nodeId": "Lesson_9_When_to_Flop_3Bet_Bluff",
+    "quizType": "anki",
+    "question": "When to Flop 3-Bet Bluff to Increase Your Hand's EV",
+    "answer": "<h2>Some Rules</h2><ol><li>Can be done both in and out of position</li><li>You typically want to use a hand class that has low EV in alternative lines</li><li>The wider and weaker your opponent's range is, the more these 3-bets punish them</li><li>The less made hands or combo draws that your opponent can have to reraise, the better the spot</li><li>Often times very small sizes can be used</li><li>If your opponent is very weak/tight and isn't bluffing enough then just bet/fold</li><li>Your blockers to their continue range will always be your first choice candidates</li></ol>"
+  },
+  {
+    "nodeId": "Lesson_10_Finding_Unconventional_Overbet_Bluffs",
+    "quizType": "anki",
+    "question": "Finding Unconventional Overbet Bluffs",
+    "answer": "<h2>The Process</h2><ul><li>Break down your opponent's range <b>street by street</b> on the way to a specific node (be realistic!)</li><li>Note <b>how non-nutted</b> their range is, and judge how <b>most players would defend</b> that range vs large bets</li><li><b>Note the gap</b> between that defense and proper defense</li></ul>"
+  },
+  {
+    "nodeId": "Lesson_11_Playing_Dynamic_Ranges",
+    "quizType": "anki",
+    "question": "Playing Dynamic Ranges",
+    "answer": "<p><em>(Tailored to Counter your Opponent's Range)</em></p><p><strong>The ability to change your betting range on any given street in order to maximally exploit an opponent's strategy (i.e., a mental node-lock).</strong><p>This is the single-most EV-increasing skill in poker (aside from a good mental game).</p></p><ul><li><strong>Always start with a good baseline strategy</strong> which will perform well on average - have a starting point for all the streets!</li><li><strong>Make a read</strong> and put players into one of three main categories:</li></ul><p><h2>1. Weak Reg/Weak Fish</h2><ul><li>Does not protect checking ranges</li><li>Overfolds</li><li>Underbluffs</li></ul><p><strong>Plan:</strong> Attack their weak, vulnerable ranges.</p></p><p><h2>2. Station/Spewer (Reg or Fish)</h2><ul><li>Likes to bluffcatch</li><li>Probably overcalls</li><li>Probably overbluffs <em>(These often go hand in hand!)</em></li></ul><p><strong>Plan:</strong> Increase value sizing; lower value threshold.</p></p><p><h2>3. Good, respectable regs</h2><ul><li>Bluffs but doesn't spew</li><li>Protects ranges</li><li>Not where your main win-rate comes from</li></ul><p><strong>Plan:</strong> Stick to baseline; play solid.</p></p>"
+  },
+  {
+    "nodeId": "Lesson_12_Playing_Dynamic_Ranges",
+    "quizType": "anki",
+    "question": "Playing Dynamic Ranges (Part 2)",
+    "answer": "<p><strong>(Tailored to Counter your Opponent's Range)</strong></p><p><em>(Part 2 - vs a Good, Aggressive, Sticky Reg)</em></p><div class=\"content\"><div class=\"section\"><div class=\"bluff-candidates\"><h2>Good Bluffing Candidates</h2><ol><li>Can make many better hands fold</li><li>Can pick up equity driven draws or hands that can keep barreling</li><li>Can make a value-bettable hand by the river</li></ol></div></div><div class=\"section\"><h2>2. Station/Spewer (Reg or Fish)</h2><ul><li>Likes to bluffcatch</li><li>Probably overcalls</li><li>Probably overbluffs</li></ul><p><strong>Plan:</strong> Increase value sizing; lower value threshold</p></div></div>"
+  },
+  {
+    "nodeId": "Lesson_13_The_Art_of_Hero_Calling",
+    "quizType": "anki",
+    "question": "The Art of Hero Calling",
+    "answer": "<h2>Some Rules</h2><ul><li>Hero calling vs too-strong ranges is the single-fastest way to absolutely DESTROY your win-rate.</li><li>Hero calling vs too-weak ranges absolutely PRINTS in spots where your opponents don't realize how easy it is for them to have too many bluffs.</li><li>Good spots to hero call are when you can logically deduce the bluff region and value region and see an asymmetry in the bluff region.</li><li>Look for spots where there is a very clear value range and clear bluff combos with no showdown value.</li><li>If you have to make unrealistic assumptions about their range, then it's probably not a good spot.</li><li>Pot odds are of course also important.</li></ul>"
+  },
+  {
+    "nodeId": "Lesson_14_Three_High_EV_Concepts",
+    "quizType": "anki",
+    "question": "Three High EV Concepts",
+    "answer": "<ul><li><div class=\"concept-title\">1. Shoving vs unbalanced sizings with strong draws</div><div class=\"sub-point\">If your opponent has overbets in his turn game but is not currently using one (especially on a wet, connected board), this could indicate a weak range.</div></li><li><div class=\"concept-title\">2. Finding your nut bluffs in every spot</div><div class=\"sub-point\">• Bluffs that are blocking his strongest hands</div><div class=\"sub-point\">• Bluffs that have the most equity when called</div></li><li><div class=\"concept-title\">3. When you have enough equity to stack off, ALWAYS think about how to allow your opponent to put in more $ with the weakest parts of their range</div></li></ul>"
+  },{
+    "nodeId": "Lesson_15_Metagame_and_Game_Flow",
+    "quizType": "anki",
+    "question": "Metagame and Game Flow",
+    "answer": "<p><ul><li>When you represent a <strong>very thin value range</strong> to the same player multiple times in succession, your fold equity <strong>goes down</strong> each time.</li><li>Keep tabs on who has seen you do what!</li><li>When your opponent tries to <strong>hero call</strong> you in a specific line and is <strong>wrong</strong>, your fold equity <strong>goes up</strong> in the immediate future.</li><li>You can preemptively <strong>widen your value range</strong> vs a specific player when the metagame and <strong>game history</strong> call for it.</li><li>The more <strong>crazy or non-standard</strong> the hand is, the more likely your opponents will take note and <strong>adjust</strong>.</li></ul></p><p><ul><li>Always <strong>rank your hands</strong> according to <strong>equity</strong> on each street.</li><li>Always use <strong>ranges and range analysis</strong> first before psychology in poker - <strong>but don't ignore it either!</strong></li></ul></p>"
+  },
+  {
+    "nodeId": "Lesson_8_",
+    "quizType": "anki",
+    "question": "",
+    "answer": ""
+  },
+  {
+    "nodeId": "Lesson_8_",
+    "quizType": "anki",
+    "question": "",
+    "answer": ""
+  },
+  {
+    "nodeId": "Lesson_8_",
+    "quizType": "anki",
+    "question": "",
+    "answer": ""
+  },
+  {
+    "nodeId": "Lesson_8_",
+    "quizType": "anki",
+    "question": "",
+    "answer": ""
+  },
+  {
+    "nodeId": "Lesson_8_",
+    "quizType": "anki",
+    "question": "",
+    "answer": ""
+  },
+  {
+    "nodeId": "Lesson_8_",
+    "quizType": "anki",
+    "question": "",
+    "answer": ""
+  },
+  {
+    "nodeId": "Lesson_8_",
+    "quizType": "anki",
+    "question": "",
+    "answer": ""
+  },
+  {
+    "nodeId": "Lesson_8_",
+    "quizType": "anki",
+    "question": "",
+    "answer": ""
+  },
+  {
+    "nodeId": "Lesson_8_",
+    "quizType": "anki",
+    "question": "",
+    "answer": ""
+  },
+  {
     "nodeId": "Lesson_21_Facing_4Bet_OOP_Splitting_Raise_Ranges",
     "quizType": "anki",
     "question": "Facing 4Bet OOP: Splitting X/R Ranges into Small/Big Sizes. How to do it?",
