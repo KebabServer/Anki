@@ -1,0 +1,193 @@
+ [
+  {
+    "nodeId": "Alvin_Low_Stakes_Preflop_Adjustments",
+    "quizType": "anki",
+    "question": "Alvin's Low Stakes Preflop Adjustments",
+    "answer": "<ul><li>3Bet linearly or fold except from big blind (exception vs raise and a call with pocket pairs)</li><li>Only set mine against 3bets if you are willing to bluff when you miss</li><li>In mp snap fold 88 to early position raise</li><li>From any position snap fold JJ to early positon 4bet</li><li>EP and earlier open fold ATo and KJo</li><li>Isolate limpers tighter</li><li>Play really tight from the BB in multi-way pots, never go multiway with offsuite cards</li></ul>"
+  },
+  {
+        "nodeId": "Facing_4Bet_OOP_001",
+        "title": "Facing 4Bet OOP",
+        "pot": "50.00 BB",
+        "communityCards": ["9c","7c","Td"],
+        "quizType": "poker_drag",
+        "displayText": "4BPot SB vs BTN",
+        "players": [
+          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "BTN", "isActive": true, "isTurn": false, "stackSize": "198.61 BB", "currentBet": "0.00 BB"},
+          {"position": "SB", "isActive": true, "isTurn": true, "stackSize": "113.88 BB", "currentBet": "0.00 BB", "isHero": true},
+          {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
+        ],
+        "choices": [
+          {"hand": "KcTc", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "Ts9s", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "9d8d", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "7h8h", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "Ac8c", "targetCategory": "Donk 10.0 BB"},
+          {"hand": "QsJs", "targetCategory": "Check"},
+         {"hand": "KhJh", "targetCategory": "Check"}
+        ]
+      },
+  {
+        "nodeId": "Facing_4Bet_OOP_002",
+        "title": "Facing 4Bet OOP",
+        "pot": "49.50 BB",
+        "communityCards": ["7s", "As", "2h"],
+        "quizType": "poker_drag",
+        "displayText": "4BPot SB vs CO",
+        "players": [
+          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": true, "isTurn": true, "stackSize": "164.82 BB", "currentBet": "4.50 BB"},
+          {"position": "BTN", "isActive": false, "isTurn": false, "stackSize": "198.61 BB", "currentBet": "0.00 BB"},
+          {"position": "SB", "isActive": true, "isTurn": false, "stackSize": "104.8 BB", "currentBet": "0.00 BB", "isHero": true},
+          {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
+        ],
+        "choices": [
+         {"hand": "5c4c", "targetCategory": "Small raise"},
+          {"hand": "7d7h", "targetCategory": "Small raise"},
+          {"hand": "AhKc", "targetCategory": "Small raise"},
+          {"hand": "AcQc", "targetCategory": "Small raise"},
+         {"hand": "7d6d", "targetCategory": "Small raise"},
+          {"hand": "8c7c", "targetCategory": "Small raise"},
+          {"hand": "5d5s", "targetCategory": "Small raise"},
+         {"hand": "QcJc", "targetCategory": "Fold"},
+         {"hand": "Tc9c", "targetCategory": "Fold"}
+        ]
+      },
+   {
+        "nodeId": "Facing_4Bet_OOP_003",
+        "title": "Facing 4Bet OOP",
+        "pot": "44.88 BB",
+        "communityCards": ["3h", "Js", "Ac"],
+        "quizType": "poker_drag",
+        "displayText": "4BPot SB vs CO",
+        "players": [
+          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": true, "isTurn": false, "stackSize": "95.2 BB", "currentBet": "4.87 BB"},
+          {"position": "BTN", "isActive": false, "isTurn": false, "stackSize": "198.61 BB", "currentBet": "0.00 BB"},
+          {"position": "SB", "isActive": true, "isTurn": true, "stackSize": "78.56 BB", "currentBet": "0.00 BB", "isHero": true},
+          {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
+        ],
+        "choices": [
+         {"hand": "5c5d", "targetCategory": "Small raise"},
+          {"hand": "5h4h", "targetCategory": "Small raise"},
+          {"hand": "KcJc", "targetCategory": "Small raise"},
+          {"hand": "AhJh", "targetCategory": "Small raise"},
+         {"hand": "AhKd", "targetCategory": "Small raise"},
+          {"hand": "8c7c", "targetCategory": "Fold"},
+         {"hand": "7h6h", "targetCategory": "Fold"},
+         {"hand": "Tc9c", "targetCategory": "Fold"}
+        ]
+      },
+  {
+        "nodeId": "Facing_4Bet_OOP_004",
+        "title": "Facing 4Bet OOP",
+        "pot": "47.5 BB",
+        "communityCards": ["4c", "5h", "Jd"],
+        "quizType": "poker_drag",
+        "displayText": "4BPot BB vs CO",
+        "players": [
+          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": true, "isTurn": false, "stackSize": "95.2 BB", "currentBet": "11.88 BB"},
+          {"position": "BTN", "isActive": false, "isTurn": false, "stackSize": "198.61 BB", "currentBet": "0.00 BB"},
+          {"position": "SB", "isActive": false, "isTurn": false, "stackSize": "78.56 BB", "currentBet": "0.00 BB"},
+          {"position": "BB", "isActive": true, "isTurn": true, "stackSize": "99.00 BB", "currentBet": "0.00 BB", "isHero": true}
+        ],
+        "choices": [
+         {"hand": "7d6d", "targetCategory": "Raise All In"},
+         {"hand": "QcQs", "targetCategory": "Raise All In"},
+         {"hand": "5s4s", "targetCategory": "Min-Raise"},
+         {"hand": "KdQd", "targetCategory": "Min-Raise"},
+         {"hand": "Tc9c", "targetCategory": "Fold"}
+        ]
+      },
+  {
+        "nodeId": "Facing_4Bet_OOP_005",
+        "title": "Facing 4Bet OOP",
+        "pot": "47.6 BB",
+        "communityCards": ["3s", "8d", "4h"],
+        "quizType": "poker_drag",
+        "displayText": "4BPot SB vs BTN",
+        "players": [
+          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": false, "isTurn": false, "stackSize": "95.2 BB", "currentBet": "0.00 BB"},
+          {"position": "BTN", "isActive": true, "isTurn": false, "stackSize": "200.61 BB", "currentBet": "11.74 BB"},
+          {"position": "SB", "isActive": true, "isTurn": true, "stackSize": "80.75 BB", "currentBet": "0.00 BB", "isHero": true},
+          {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
+        ],
+        "choices": [
+         {"hand": "6h5h", "targetCategory": "Raise All In"},
+         {"hand": "Ad5d", "targetCategory": "Raise All In"},
+         {"hand": "9d9h", "targetCategory": "Raise All In"},
+         {"hand": "8c7c", "targetCategory": "Raise All In"},
+         {"hand": "JcJs", "targetCategory": "Min-Raise"},
+          {"hand": "TdTh", "targetCategory": "Min-Raise"},
+          {"hand": "Td9d", "targetCategory": "Min-Raise"},
+          {"hand": "JsTs", "targetCategory": "Min-Raise"}
+        ]
+      },
+  {
+        "nodeId": "Facing_4Bet_OOP_006",
+        "title": "Facing 4Bet OOP",
+        "pot": "50.0 BB",
+        "communityCards": ["3h", "4d", "Qh"],
+        "quizType": "poker_drag",
+        "displayText": "4BPot SB vs BTN",
+        "players": [
+          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": false, "isTurn": false, "stackSize": "95.2 BB", "currentBet": "0.00 BB"},
+          {"position": "BTN", "isActive": true, "isTurn": false, "stackSize": "97.88 BB", "currentBet": "10.00 BB"},
+          {"position": "SB", "isActive": true, "isTurn": true, "stackSize": "78.42 BB", "currentBet": "0.00 BB", "isHero": true},
+          {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
+        ],
+        "choices": [
+         {"hand": "Jh9h", "targetCategory": "Raise All In"},
+         {"hand": "QsJs", "targetCategory": "Raise All In"},
+         {"hand": "AcQc", "targetCategory": "Min-Raise"},
+         {"hand": "KcQc", "targetCategory": "Min-Raise"},
+         {"hand": "KdJd", "targetCategory": "Min-Raise"},
+         {"hand": "AdTd", "targetCategory": "Min-Raise"},
+         {"hand": "Ac5c", "targetCategory": "Min-Raise"}
+        ]
+      },
+  {
+        "nodeId": "Facing_4Bet_OOP_007",
+        "title": "Facing 4Bet OOP",
+        "pot": "47.0 BB",
+        "communityCards": ["Jh", "5h", "8d"],
+        "quizType": "poker_drag",
+        "displayText": "4BPot SB vs BTN",
+        "players": [
+          {"position": "UTG", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "HJ", "isActive": false, "isTurn": false, "stackSize": "100.00 BB", "currentBet": "0.00 BB"},
+          {"position": "CO", "isActive": false, "isTurn": false, "stackSize": "95.2 BB", "currentBet": "0.00 BB"},
+          {"position": "BTN", "isActive": true, "isTurn": false, "stackSize": "101.57 BB", "currentBet": "13.55 BB"},
+          {"position": "SB", "isActive": true, "isTurn": true, "stackSize": "77.0 BB", "currentBet": "0.00 BB", "isHero": true},
+          {"position": "BB", "isActive": false, "isTurn": false, "stackSize": "99.00 BB", "currentBet": "0.00 BB"}
+        ],
+        "choices": [
+         {"hand": "Td9d", "targetCategory": "Raise All In"},
+         {"hand": "Kh6h", "targetCategory": "Raise All In"},
+         {"hand": "7s6s", "targetCategory": "Raise All In"},
+         {"hand": "QcJc", "targetCategory": "Raise All In"},
+         {"hand": "AcJd", "targetCategory": "Min-Raise"},
+         {"hand": "KcJd", "targetCategory": "Min-Raise"},
+         {"hand": "5d5c", "targetCategory": "Min-Raise"},
+         {"hand": "8s8h", "targetCategory": "Min-Raise"},
+         {"hand": "AhAs", "targetCategory": "Min-Raise"},
+         {"hand": "AdTd", "targetCategory": "Min-Raise"},
+         {"hand": "KdTd", "targetCategory": "Min-Raise"},
+         {"hand": "JcJd", "targetCategory": "Min-Raise"},
+         {"hand": "9c9d", "targetCategory": "Min-Raise"},
+         {"hand": "ThTd", "targetCategory": "Min-Raise"},
+         {"hand": "6d5d", "targetCategory": "Min-Raise"}
+        ]
+      }
+ ]
